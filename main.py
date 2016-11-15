@@ -1,10 +1,10 @@
-import gym
 import random
 import logging
 import tensorflow as tf
 
 from utils import get_model_dir
 from networks.cnn import CNN
+from networks.rnn_cnn import RNNCNN
 from networks.mlp import MLPSmall
 from agents.statistic import Statistic
 from environments.environment import ToyEnvironment, AtariEnvironment
@@ -23,6 +23,7 @@ flags.DEFINE_string('env_name', 'Breakout-v0', 'The name of gym environment to u
 flags.DEFINE_integer('n_action_repeat', 4, 'The number of actions to repeat')
 flags.DEFINE_integer('max_random_start', 30, 'The maximum number of NOOP actions at the beginning of an episode')
 flags.DEFINE_integer('history_length', 4, 'The length of history of observation to use as an input to DQN')
+flags.DEFINE_integer('num_steps', 2, 'The number of steps to take in the history, history_length \% num_steps == 0')
 flags.DEFINE_integer('max_r', +1, 'The maximum value of clipped reward')
 flags.DEFINE_integer('min_r', -1, 'The minimum value of clipped reward')
 flags.DEFINE_string('observation_dims', '[80, 80]', 'The dimension of gym observation')
@@ -67,21 +68,22 @@ flags.DEFINE_integer('random_seed', 123, 'Value of random seed')
 flags.DEFINE_string('tag', '', 'The name of tag for a model, only for debugging')
 flags.DEFINE_string('gpu_fraction', '1/1', 'idx / # of gpu fraction e.g. 1/3, 2/3, 3/3')
 
-def calc_gpu_fraction(fraction_string):
-  idx, num = fraction_string.split('/')
-  idx, num = float(idx), float(num)
 
-  fraction = 1 / (num - idx + 1)
-  print (" [*] GPU : %.4f" % fraction)
-  return fraction
+def calc_gpu_fraction(fraction_string):
+    idx, num = fraction_string.split('/')
+    idx, num = float(idx), float(num)
+
+    fraction = 1 / (num - idx + 1)
+    print (" [*] GPU : %.4f" % fraction)
+    return fraction
 
 conf = flags.FLAGS
 
 if conf.agent_type == 'DQN':
-  from agents.deep_q import DeepQ
-  TrainAgent = DeepQ
+    from agents.deep_q import DeepQ
+    TrainAgent = DeepQ
 else:
-  raise ValueError('Unknown agent_type: %s' % conf.agent_type)
+    raise ValueError('Unknown agent_type: %s' % conf.agent_type)
 
 logger = logging.getLogger()
 logger.propagate = False
@@ -91,75 +93,93 @@ logger.setLevel(conf.log_level)
 tf.set_random_seed(conf.random_seed)
 random.seed(conf.random_seed)
 
+
 def main(_):
-  # preprocess
-  conf.observation_dims = eval(conf.observation_dims)
+    # preprocess
+    conf.observation_dims = eval(conf.observation_dims)
 
-  for flag in ['memory_size', 't_target_q_update_freq', 't_test',
-               't_ep_end', 't_train_max', 't_learn_start', 'learning_rate_decay_step']:
-    setattr(conf, flag, getattr(conf, flag) * conf.scale)
+    for flag in ['memory_size', 't_target_q_update_freq', 't_test',
+                 't_ep_end', 't_train_max', 't_learn_start', 'learning_rate_decay_step']:
+        setattr(conf, flag, getattr(conf, flag) * conf.scale)
 
-  if conf.use_gpu:
-    conf.data_format = 'NCHW'
-  else:
-    conf.data_format = 'NHWC'
-
-  model_dir = get_model_dir(conf,
-      ['use_gpu', 'max_random_start', 'n_worker', 'is_train', 'memory_size', 'gpu_fraction',
-       't_save', 't_train', 'display', 'log_level', 'random_seed', 'tag', 'scale'])
-
-  # start
-  gpu_options = tf.GPUOptions(
-      per_process_gpu_memory_fraction=calc_gpu_fraction(conf.gpu_fraction))
-
-  with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-    if any(name in conf.env_name for name in ['Corridor', 'FrozenLake']) :
-      env = ToyEnvironment(conf.env_name, conf.n_action_repeat, conf.max_random_start,
-                        conf.observation_dims, conf.data_format, conf.display)
+    if conf.use_gpu:
+        conf.data_format = 'NCHW'
     else:
-      env = AtariEnvironment(conf.env_name, conf.n_action_repeat, conf.max_random_start,
-                        conf.observation_dims, conf.data_format, conf.display)
+        conf.data_format = 'NHWC'
 
-    if conf.network_header_type in ['nature', 'nips']:
-      pred_network = CNN(sess=sess,
-                         data_format=conf.data_format,
-                         history_length=conf.history_length,
-                         observation_dims=conf.observation_dims,
-                         output_size=env.env.action_space.n,
-                         network_header_type=conf.network_header_type,
-                         name='pred_network', trainable=True)
-      target_network = CNN(sess=sess,
-                           data_format=conf.data_format,
-                           history_length=conf.history_length,
-                           observation_dims=conf.observation_dims,
-                           output_size=env.env.action_space.n,
-                           network_header_type=conf.network_header_type,
-                           name='target_network', trainable=False)
-    elif conf.network_header_type == 'mlp':
-      pred_network = MLPSmall(sess=sess,
-                              observation_dims=conf.observation_dims,
-                              history_length=conf.history_length,
-                              output_size=env.env.action_space.n,
-                              hidden_activation_fn=tf.sigmoid,
-                              network_output_type=conf.network_output_type,
-                              name='pred_network', trainable=True)
-      target_network = MLPSmall(sess=sess,
-                                observation_dims=conf.observation_dims,
-                                history_length=conf.history_length,
-                                output_size=env.env.action_space.n,
-                                hidden_activation_fn=tf.sigmoid,
-                                network_output_type=conf.network_output_type,
-                                name='target_network', trainable=False)
-    else:
-      raise ValueError('Unkown network_header_type: %s' % (conf.network_header_type))
+    model_dir = get_model_dir(conf,
+            ['use_gpu', 'max_random_start', 'n_worker', 'is_train', 'memory_size', 'gpu_fraction',
+             't_save', 't_train', 'display', 'log_level', 'random_seed', 'tag', 'scale'])
 
-    stat = Statistic(sess, conf.t_test, conf.t_learn_start, model_dir, pred_network.var.values())
-    agent = TrainAgent(sess, pred_network, env, stat, conf, target_network=target_network)
+    # start
+    gpu_options = tf.GPUOptions(
+            per_process_gpu_memory_fraction=calc_gpu_fraction(conf.gpu_fraction))
 
-    if conf.is_train:
-      agent.train(conf.t_train_max)
-    else:
-      agent.play(conf.ep_end)
+    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+        if any(name in conf.env_name for name in ['Corridor', 'FrozenLake']):
+            env = ToyEnvironment(conf.env_name, conf.n_action_repeat, conf.max_random_start,
+                                 conf.observation_dims, conf.data_format, conf.display)
+        else:
+            env = AtariEnvironment(conf.env_name, conf.n_action_repeat, conf.max_random_start,
+                                  conf.observation_dims, conf.data_format, conf.display)
+
+        if conf.network_header_type == 'rnn_cnn':
+            pred_network = RNNCNN(sess=sess,
+                                  data_format=conf.data_format,
+                                  history_length=conf.history_length,
+                                  num_steps=conf.num_steps,
+                                  observation_dims=conf.observation_dims,
+                                  output_size=env.env.action_space.n,
+                                  network_header_type=conf.network_header_type,
+                                  name='pred_network', trainable=True)
+            target_network = RNNCNN(sess=sess,
+                                    data_format=conf.data_format,
+                                    history_length=conf.history_length,
+                                    num_steps=conf.num_steps,
+                                    observation_dims=conf.observation_dims,
+                                    output_size=env.env.action_space.n,
+                                    network_header_type=conf.network_header_type,
+                                    name='target_network', trainable=False)
+        elif conf.network_header_type in ['nature', 'nips']:
+            pred_network = CNN(sess=sess,
+                               data_format=conf.data_format,
+                               history_length=conf.history_length,
+                               observation_dims=conf.observation_dims,
+                               output_size=env.env.action_space.n,
+                               network_header_type=conf.network_header_type,
+                               name='pred_network', trainable=True)
+            target_network = CNN(sess=sess,
+                                 data_format=conf.data_format,
+                                 history_length=conf.history_length,
+                                 observation_dims=conf.observation_dims,
+                                 output_size=env.env.action_space.n,
+                                 network_header_type=conf.network_header_type,
+                                 name='target_network', trainable=False)
+        elif conf.network_header_type == 'mlp':
+            pred_network = MLPSmall(sess=sess,
+                                    observation_dims=conf.observation_dims,
+                                    history_length=conf.history_length,
+                                    output_size=env.env.action_space.n,
+                                    hidden_activation_fn=tf.sigmoid,
+                                    network_output_type=conf.network_output_type,
+                                    name='pred_network', trainable=True)
+            target_network = MLPSmall(sess=sess,
+                                      observation_dims=conf.observation_dims,
+                                      history_length=conf.history_length,
+                                      output_size=env.env.action_space.n,
+                                      hidden_activation_fn=tf.sigmoid,
+                                      network_output_type=conf.network_output_type,
+                                      name='target_network', trainable=False)
+        else:
+            raise ValueError('Unkown network_header_type: %s' % (conf.network_header_type))
+
+        stat = Statistic(sess, conf.t_test, conf.t_learn_start, model_dir, pred_network.var.values())
+        agent = TrainAgent(sess, pred_network, env, stat, conf, target_network=target_network)
+
+        if conf.is_train:
+            agent.train(conf.t_train_max)
+        else:
+            agent.play(conf.ep_end)
 
 if __name__ == '__main__':
-  tf.app.run()
+    tf.app.run()
