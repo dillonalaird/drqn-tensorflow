@@ -116,5 +116,5 @@ class AtariEnvironment(Environment):
   def preprocess(self, raw_screen, terminal):
     y = 0.2126 * raw_screen[:, :, 0] + 0.7152 * raw_screen[:, :, 1] + 0.0722 * raw_screen[:, :, 2]
     y = y.astype(np.uint8)
-    y_screen = imresize(y, self.observation_dims)
+    y_screen = imresize(y, tuple(self.observation_dims))
     return y_screen
