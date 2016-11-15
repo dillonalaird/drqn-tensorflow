@@ -37,44 +37,22 @@ class RNNCNN(Network):
         self.l0s = tf.split(1, num_steps, self.l0s)
 
         layers = []
-        for t,l0 in enumerate(self.l0s):
-            # TODO: not sure why get_variable is not just reusing variables
-            if t > 0: tf.get_variable_scope().reuse_variables()
-            with tf.variable_scope(name):
-                if network_header_type.lower() == 'nature':
-                    self.l1, self.var['l1_w'], self.var['l1_b'] = conv2d(l0,
-                            32, [8, 8], [4, 4], weights_initializer, biases_initializer,
-                            hidden_activation_fn, data_format, name='l1_conv')
-                    self.l2, self.var['l2_w'], self.var['l2_b'] = conv2d(self.l1,
-                            64, [4, 4], [2, 2], weights_initializer, biases_initializer,
-                            hidden_activation_fn, data_format, name='l2_conv')
-                    self.l3, self.var['l3_w'], self.var['l3_b'] = conv2d(self.l2,
-                            64, [3, 3], [1, 1], weights_initializer, biases_initializer,
-                            hidden_activation_fn, data_format, name='l3_conv')
-                    self.l4, self.var['l4_w'], self.var['l4_b'] = \
-                            linear(self.l3, 512, weights_initializer, biases_initializer,
-                            hidden_activation_fn, data_format, name='l4_conv')
-                    layer = self.l4
-                elif network_header_type.lower() == 'nips':
-                    self.l1, self.var['l1_w'], self.var['l1_b'] = conv2d(l0,
-                            16, [8, 8], [4, 4], weights_initializer, biases_initializer,
-                            hidden_activation_fn, data_format, name='l1_conv')
-                    self.l2, self.var['l2_w'], self.var['l2_b'] = conv2d(self.l1,
-                            32, [4, 4], [2, 2], weights_initializer, biases_initializer,
-                            hidden_activation_fn, data_format, name='l2_conv')
-                    self.l3, self.var['l3_w'], self.var['l3_b'] = \
-                            linear(self.l2, 256, weights_initializer, biases_initializer,
-                            hidden_activation_fn, data_format, name='l3_conv')
-                    layer = self.l3
-                else:
-                    raise ValueError('Wrong DQN type: %s' % network_header_type)
-                layers.append(layer)
+        with tf.variable_scope(name):
+            for t,l0 in enumerate(self.l0s):
+                # TODO: not sure why get_variable is not just reusing variables
+                if t > 0: tf.get_variable_scope().reuse_variables()
+                self.l1, self.var['l1_w'], self.var['l1_b'] = conv2d(l0,
+                        16, [8, 8], [4, 4], weights_initializer, biases_initializer,
+                        hidden_activation_fn, data_format, name='l1_conv')
+                self.l2, self.var['l2_w'], self.var['l2_b'] = conv2d(self.l1,
+                        32, [4, 4], [2, 2], weights_initializer, biases_initializer,
+                        hidden_activation_fn, data_format, name='l2_conv')
+                self.l3, self.var['l3_w'], self.var['l3_b'] = \
+                        linear(self.l2, 256, weights_initializer, biases_initializer,
+                        hidden_activation_fn, data_format, name='l3_conv')
+                layers.append(self.l3)
 
-        if network_header_type.lower() == 'nature':
-            self.cell = tf.nn.rnn_cell.LSTMCell(512)
-        elif network_header_type.lower() == 'nips':
-            self.cell = tf.nn.rnn_cell.LSTMCell(256)
-
+        self.cell = tf.nn.rnn_cell.LSTMCell(256)
         layer, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers), dtype=tf.float32,
                                          time_major=True)
         layer = tf.squeeze(layer, [0])
