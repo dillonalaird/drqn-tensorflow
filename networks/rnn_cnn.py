@@ -52,12 +52,13 @@ class RNNCNN(Network):
                         hidden_activation_fn, data_format, name='l3_conv')
                 layers.append(self.l3)
 
-        self.cell = tf.nn.rnn_cell.LSTMCell(256)
-        layer, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers), dtype=tf.float32,
-                                         time_major=True)
-        layer = tf.squeeze(layer, [0])
+        with tf.variable_scope(name):
+            self.cell = tf.nn.rnn_cell.LSTMCell(256)
+            outputs, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers), dtype=tf.float32,
+                                               time_major=True)
+            layer = outputs[-1]
 
-        self.build_output_ops(layer, network_output_type,
-                value_hidden_sizes, advantage_hidden_sizes, output_size,
-                weights_initializer, biases_initializer, hidden_activation_fn,
-                output_activation_fn, trainable)
+            self.build_output_ops(layer, network_output_type,
+                    value_hidden_sizes, advantage_hidden_sizes, output_size,
+                    weights_initializer, biases_initializer, hidden_activation_fn,
+                    output_activation_fn, trainable)
