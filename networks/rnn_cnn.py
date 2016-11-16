@@ -9,6 +9,7 @@ class RNNCNN(Network):
                  data_format,
                  history_length,
                  num_steps,
+                 num_layers,
                  observation_dims,
                  output_size,
                  trainable=True,
@@ -54,6 +55,7 @@ class RNNCNN(Network):
 
         with tf.variable_scope(name):
             self.cell = tf.nn.rnn_cell.LSTMCell(256)
+            self.cell = tf.nn.rnn_cell.MultiRNNCell([self.cell]*num_layers)
             outputs, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers), dtype=tf.float32,
                                                time_major=True)
             layer = outputs[-1]

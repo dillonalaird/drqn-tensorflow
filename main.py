@@ -17,6 +17,7 @@ flags.DEFINE_string('agent_type', 'DQN', 'The type of agent [DQN]')
 flags.DEFINE_boolean('double_q', False, 'Whether to use double Q-learning')
 flags.DEFINE_string('network_header_type', 'nips', 'The type of network header [mlp, nature, nips]')
 flags.DEFINE_string('network_output_type', 'normal', 'The type of network output [normal, dueling]')
+flags.DEFINE_integer('num_layers', 2, 'The number of layers for the RNN')
 
 # Environment
 flags.DEFINE_string('env_name', 'Breakout-v0', 'The name of gym environment to use')
@@ -128,6 +129,7 @@ def main(_):
                                   data_format=conf.data_format,
                                   history_length=conf.history_length,
                                   num_steps=conf.num_steps,
+                                  num_layers=conf.num_layers,
                                   observation_dims=conf.observation_dims,
                                   output_size=env.env.action_space.n,
                                   network_header_type=conf.network_header_type,
@@ -136,6 +138,7 @@ def main(_):
                                     data_format=conf.data_format,
                                     history_length=conf.history_length,
                                     num_steps=conf.num_steps,
+                                    num_layers=conf.num_layers,
                                     observation_dims=conf.observation_dims,
                                     output_size=env.env.action_space.n,
                                     network_header_type=conf.network_header_type,
