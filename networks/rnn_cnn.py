@@ -10,6 +10,7 @@ class RNNCNN(Network):
                  history_length,
                  num_steps,
                  num_layers,
+                 use_attention,
                  observation_dims,
                  output_size,
                  trainable=True,
@@ -54,11 +55,23 @@ class RNNCNN(Network):
                 layers.append(self.l3)
 
         with tf.variable_scope(name):
+            self.va   = tf.get_variable("va", shape=[256])
             self.cell = tf.nn.rnn_cell.LSTMCell(256)
             self.cell = tf.nn.rnn_cell.MultiRNNCell([self.cell]*num_layers)
             outputs, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers), dtype=tf.float32,
                                                time_major=True)
-            layer = outputs[-1]
+            if use_attention:
+                # TODO: va*tanh(W*ht)? this is just linear, maybe concat last
+                # hidden state/most recent?
+                scores = tf.reduce_sum(tf.mul(outputs, self.va), 2)
+                a_t = tf.nn.softmax(tf.transpose(scores))
+                a_t = tf.expand_dims(a_t, 2)
+                c_t = tf.batch_matmul(tf.transpose(outputs, perm=[1,2,0]), a_t)
+                c_t = tf.squeeze(c_t, [2])
+                # TODO: extra nonlinearity?
+                layer = c_t
+            else:
+                layer = outputs[-1]
 
             self.build_output_ops(layer, network_output_type,
                     value_hidden_sizes, advantage_hidden_sizes, output_size,
