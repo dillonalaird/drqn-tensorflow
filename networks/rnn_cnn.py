@@ -1,8 +1,8 @@
-import os
 import tensorflow as tf
 
 from .layers import *
 from .network import Network
+
 
 class RNNCNN(Network):
     def __init__(self, sess,
@@ -36,7 +36,10 @@ class RNNCNN(Network):
 
         self.var = {}
         self.l0s = tf.div(self.inputs, 255.)
-        self.l0s = tf.split(1, num_steps, self.l0s)
+        if data_format == 'NHWC':
+            self.l0s = tf.split(3, num_steps, self.l0s)
+        elif data_format == 'NCHW':
+            self.l0s = tf.split(1, num_steps, self.l0s)
 
         layers = []
         with tf.variable_scope(name):
