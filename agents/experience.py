@@ -24,7 +24,6 @@ class Experience(object):
         self.current = 0
 
     def add(self, observation, reward, action, terminal):
-        print "add: count={}, current={}".format(self.count, self.current)
         self.actions[self.current] = action
         self.rewards[self.current] = reward
         self.observations[self.current, ...] = observation
