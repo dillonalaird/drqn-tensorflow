@@ -33,8 +33,6 @@ class Experience(object):
         self.current = (self.current + 1) % self.memory_size
 
     def sample(self):
-        print "sample: history_length={}, count={}, current={}" \
-            .format(self.history_length, self.count, self.current)
         assert self.count > self.history_length
         indexes = []
         while len(indexes) < self.batch_size:
@@ -42,8 +40,10 @@ class Experience(object):
                 index = random.randint(self.history_length, self.count - 1)
                 if index >= self.current and index - self.history_length < self.current:
                     continue
-                if self.terminals[(index - self.history_length):index].any():
-                    continue
+                # this requirement does not work for longer history_lengths,
+                # TODO: try using pads for states from previous episodes
+                #if self.terminals[(index - self.history_length):index].any():
+                #    continue
                 break
 
             self.prestates[len(indexes), ...] = self.retreive(index - 1)
@@ -65,5 +65,6 @@ class Experience(object):
         if index >= self.history_length - 1:
             return self.observations[(index - (self.history_length - 1)):(index + 1), ...]
         else:
+            # TODO: sampled from terminal states?
             indexes = [(index - i) % self.count for i in reversed(range(self.history_length))]
             return self.observations[indexes, ...]
