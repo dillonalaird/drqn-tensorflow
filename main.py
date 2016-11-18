@@ -17,7 +17,7 @@ flags.DEFINE_string('agent_type', 'DQN', 'The type of agent [DQN]')
 flags.DEFINE_boolean('double_q', False, 'Whether to use double Q-learning')
 flags.DEFINE_string('network_header_type', 'nips', 'The type of network header [mlp, nature, nips]')
 flags.DEFINE_string('network_output_type', 'normal', 'The type of network output [normal, dueling]')
-flags.DEFINE_integer('num_layers', 2, 'The number of layers for the RNN')
+flags.DEFINE_integer('num_layers', 1, 'The number of layers for the RNN')
 flags.DEFINE_boolean('use_attention', False, 'If True uses an attention RNN')
 
 # Environment
