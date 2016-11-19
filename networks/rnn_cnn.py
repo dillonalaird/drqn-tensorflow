@@ -46,23 +46,23 @@ class RNNCNN(Network):
             for t,l0 in enumerate(self.l0s):
                 # TODO: not sure why get_variable is not just reusing variables
                 if t > 0: tf.get_variable_scope().reuse_variables()
-                self.l1, self.var['l1_w'], self.var['l1_b'] = conv2d(l0,
+                l1, self.var['l1_w'], self.var['l1_b'] = conv2d(l0,
                         16, [8, 8], [4, 4], weights_initializer, biases_initializer,
                         hidden_activation_fn, data_format, name='l1_conv')
-                self.l2, self.var['l2_w'], self.var['l2_b'] = conv2d(self.l1,
+                l2, self.var['l2_w'], self.var['l2_b'] = conv2d(l1,
                         32, [4, 4], [2, 2], weights_initializer, biases_initializer,
                         hidden_activation_fn, data_format, name='l2_conv')
-                self.l3, self.var['l3_w'], self.var['l3_b'] = \
-                        linear(self.l2, 256, weights_initializer, biases_initializer,
+                l3, self.var['l3_w'], self.var['l3_b'] = linear(l2,
+                        256, weights_initializer, biases_initializer,
                         hidden_activation_fn, data_format, name='l3_conv')
-                layers.append(self.l3)
+                layers.append(l3)
 
         with tf.variable_scope(name):
             self.va   = tf.get_variable("va", shape=[256])
             self.cell = tf.nn.rnn_cell.LSTMCell(256)
             self.cell = tf.nn.rnn_cell.MultiRNNCell([self.cell]*num_layers)
-            outputs, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers), dtype=tf.float32,
-                                               time_major=True)
+            outputs, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers),
+                                               dtype=tf.float32, time_major=True)
             if use_attention:
                 # TODO: va*tanh(W*ht)? this is just linear, maybe concat last
                 # hidden state/most recent?
