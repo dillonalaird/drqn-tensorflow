@@ -66,8 +66,11 @@ class Experience(object):
         # This prepads observations, so observations from previous episodes are
         # set to 0
         cutoff = 0
+        self.terminals[indexes] = False
+        self.terminals[indexes[-1]] = True
         for i in reversed(xrange(len(indexes))):
-            if self.terminals[indexes[i]]:
+            # if it ends on a terminal ignore it
+            if self.terminals[indexes[i]] and i < len(indexes) - 1:
                 cutoff = i + 1
                 break
         obs[cutoff:] = self.observations[indexes[cutoff:],...]
