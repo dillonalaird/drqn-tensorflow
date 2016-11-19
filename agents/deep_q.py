@@ -53,8 +53,7 @@ class DeepQ(Agent):
 
         # TODO: if we've hit a terminal state, we don't want to use states from
         # a previous episode fo prediction.
-        #if terminal:
-        #    self.history.reset()
+        if terminal: self.history.reset()
 
         # q, loss, is_update
         result = [], 0, False
