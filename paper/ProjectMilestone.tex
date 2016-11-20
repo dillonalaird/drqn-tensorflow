@@ -53,36 +53,45 @@
 \maketitle
 
 \begin{abstract}
-  For our project, we plan to explore a newer subfield of reinforcement learning called deep Q learning (DQN). In DQN we train a neural network model with a variant of Q-learning, where our input is raw pixels and our output is a value function estimating future rewards [1]. 
-  %The abstract paragraph should be indented \nicefrac{1}{2}~inch
-  %(3~picas) on both the left- and right-hand margins. Use 10~point
-  %type, with a vertical spacing (leading) of 11~points.  The word
-  %\textbf{Abstract} must be centered, bold, and in point size 12. Two
-  %line spaces precede the abstract. The abstract must be limited to
-  %one paragraph.
+  Deep reinforcement learning models have proven to be successful at learning
+  control policies image inputs. They have, however, struggled with learning
+  policies that require longer term information. Recurrent neural network
+  architectures have be used in tasks dealing with longer term dependencies
+  between data points. We investigate these architectures to overcome the
+  difficulties arising from learning policies with long term dependencies.
 \end{abstract}
 
 \section{Introduction}
-	In DQN we use a neural network to predict our action value, the Q function. The algorithm is similar to Q learning except for two distinctions. The first is called experience replay which randomly selects a past state to use in its gradient. This "break up" the learning from using consecutive correlated sequences and helps reduce variance in the updates. The second distinction is to make a copy of the Q network to generate targets to train on. This helps reduce the chance of oscillations or divergence. [0]
+Deep Q-Networks (DQNs) have had success playing Atari 2600 games [0] but have 
+struggled with particular games involving policies that require longer term
+information. This is evident from the types of games that DQNs perform poorly at,
+near or below human-level, which includes Q*bert, Ms. Pac-Man, and in an extreme
+case Montezuma's Revenge.
+\begin{figure}[h]
+    \centering
+    \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
+\end{figure}
 
-	We think there are several ways of improving DQN. Current deep RL algorithms use slow gradient-based updates of policy or value functions.  As a result, these algorithms cannot rapidly assimilate winning game strategies.  We wish to experiment with approaches that can rapidly update experience replay. Experience replay can require significant memory overhead and naively samples over the set randomly to help with training. We want to investigate ways to store less experiences and also select experiences that might provide a better gradient update than a completely random experience. One way to attack this problem is to prioritize the experiences by some metric that would lead to better updates.
-
-	A key component of the DQN algorithm is the preprocessing function $\phi$ which maps observations and action sequences (experiences) to our Q function. In [0] a convolutional neural network is used to map the game images. This can be improved upon by feeding the output of the convolutional neural network into an recurrent neural network (RNN) as in [4] to provide a representation over multiple observations. We can take this idea even further by augmenting the RNN with an attention-like mechanism or a memory component so it can obtain a better representation of states even further in the past than what a typical RNN could do. 
-
-	There are several metrics we can use. One is the score achieved on each game. This can be found in extended data table 2 [0]. Another metric is average score per episode or average action value over training epochs, found in figure 2 [0]. We will be focusing on games that DQN struggles with such as Ms. Pac-Man and Frostbite. This can be used to compare the speed at which different algorithms learn. To run the simulations we will be using OpenAI's gym toolkit for simulating Atari games and we will use Tensorflow to construct and execute the algorithms.
-
+Recurrent neural networks (RNNs) have been used in modeling longer sequences and
+is one way to overcome DQNs difficulties with learning policies that require longer
+term information. We investigate augmenting DQN architecture proposed in [0], utilizing
+a convolutional neural network (CNN), with an RNN.
+\section{Recurrent Deep Q-Learning}
+DQN
 \section{Experiments}
 Experiments.
- 
 \section*{References}
-	0. "Human-level control through deep reinforcement learning" Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin Riedmiller, Andreas K. Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg \& Demis Hassabis \\
-	\\
-	1. "Playing Atari with Deep Reinforcement Learning" Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller \\
-	\\
-	2. "Model-Free Episodic Control" Charlse Blundell, Benigno Uria, Alexander Pritzel, Yazhe Li, Avraham Runderman, Joel Z Leibo, Jack Rae, Daan Wierstra, Demis Hassabis \\
-	\\
-	3. "Neural Machine Translation By Jointly Learning To Align and Translate" Dzmitry Bahdanau, Kyunghyun Cho, Yoshua Bengio \\
-	\\
-	4. "Deep Recurrent Q-Learning for Partially Observable MDPs" Matthew Hausknecht and Peter Stone
+\small
+
+% TODO: need to figure out how to cite this stuff properly..
+[0] "Human-level control through deep reinforcement learning" Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin Riedmiller, Andreas K. Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg \& Demis Hassabis
+
+[1] "Playing Atari with Deep Reinforcement Learning" Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller \\
+
+[2] "Model-Free Episodic Control" Charlse Blundell, Benigno Uria, Alexander Pritzel, Yazhe Li, Avraham Runderman, Joel Z Leibo, Jack Rae, Daan Wierstra, Demis Hassabis \\
+
+[3] "Neural Machine Translation By Jointly Learning To Align and Translate" Dzmitry Bahdanau, Kyunghyun Cho, Yoshua Bengio \\
+
+[4] "Deep Recurrent Q-Learning for Partially Observable MDPs" Matthew Hausknecht and Peter Stone
 
 \end{document}
