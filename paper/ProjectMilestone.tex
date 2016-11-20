@@ -23,6 +23,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{bbm}
 
 \title{Deep Q-Learning with Recurrent Neural Networks}
 
@@ -75,31 +76,17 @@
     \\
     Deep Q-networks are limited in the sense that they learn a mapping from a
     limited number of past states, or game screens.  In practice, DQN is trained
-    using an input consisting of the last four states (or game screens).  Thus,
-    DQN performs poorly at games that require the agent to remember information
-    more than four screens ago.  In other words, the game could no longer be
-    modeled as a true Markov Decision Process; all of the information needed to
-    make an optimal action would no longer be contained in a single state.  We
+    using an input consisting of the last four game screens.  Thus, DQN performs
+    poorly at games that require the agent to remember information more than four
+    screens ago.  In other words, the game could no longer be modeled as a true
+    Markov decision process; all of the information needed to make an optimal
+    action would no longer be contained in a single state. This is evident from
+    types of games DQN performs poorly at, near or below human-level Figure 1. We
     explore the concept of a Deep Recurrent Q-network, a combination of a Long
-    Short Term Memory (LSTM) [add reference] and a Deep Q-network.  We wish to
-    demonstrate that introducing recurrent network architecture into the Deep
+    Short Term Memory (LSTM) [add reference] and a Deep Q-network (DRQN).  We wish
+    to demonstrate that introducing recurrent network architecture into the Deep
     Q-network, the network can retain information from previous frames of the
     game and achieve good performance on games that require long term planning. \\
-    \\
-    In addition, recent achievements of visual attention models have introduced
-    people to exploring the possibility of incorporating attention mechanisms
-    into the structure of the DRQN algorithm.  The advantage of using attention
-    mechanisms is that DRQN acquires the ability to select and focus on small
-    informative regions of an input image, thus helping to reduce the total
-    number of parameters in the deep neural network and computation operations
-    needed for training and testing.  \\
-    \\
-    \\
-    Deep Q-Networks (DQNs) have had success playing Atari 2600 games [0] but have 
-    struggled with particular games involving policies that require longer term
-    information. This is evident from the types of games that DQNs perform poorly at,
-    near or below human-level, which includes Q*bert, Ms. Pac-Man, and in an extreme
-    case Montezuma's Revenge.
 
     \begin{figure}[h]
         \centering
@@ -113,14 +100,17 @@
         \end{minipage}
         \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
     \end{figure}
-    
-    Recurrent neural networks (RNNs) have been used in modeling longer sequences and
-    is one way to overcome DQNs difficulties with learning policies that require longer
-    term information. We investigate augmenting DQN architecture proposed in [0], utilizing
-    a convolutional neural network (CNN), with an RNN.
 
-\section{Recurrent Deep Q-Learning}
-We propose two architectures for the Recurrent Deep Q-Network (RDQN). The first
+    In addition, recent achievements of attention recurrent neural networks in
+    long term sequence tasks have introduced the possibility of incorporating
+    them into the structure of teh DRQN algorithm.  The advantage of using
+    attention is that it enables DRQN to focus on particular previous states it
+    deems important for predicting the action in the current state. We investigate
+    augmenting DRQN with attention and evaluate its usefulness. \\
+
+
+\section{Deep Recurrent Q-Learning}
+We propose two architectures for the Deep Recurrent Q-Network (DRQN). The first
 is a very basic extension of DQN. We look at the last $L$ states, $\{s_{t-(L-1)},
 \dots, s_{t}\}$ and feed these into a convolutional neural network (CNN) to get
 intermediate outputs $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then fed into a
@@ -139,10 +129,29 @@ and we take the inner product with a learned vector $v_a$, $\{v_a^Th_{t-(L-1)}, 
 v_a^Th_{t}\}$. We then take a softmax over these values, $a_{t-i} =
 \text{softmax}(v_a^Th_{t-i})$. We use this softmax to take a weighted sum over
 the hidden states to get a context vector, $c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$.
-This context vector is then used to predict the $Q$ value.
-
+This context vector is then used to predict the $Q$ value. \\
+\\
+Learning sequences of observations creates some difficulty when sampling experiences
+and using the following loss function [0]:
+$$L_i(\theta_i) = \mathbb{E}_{e_t \sim U(D)}
+\Big[\Big(
+r_t + \gamma \max_{a_t'}Q(s_{t+1}, a_t'; \theta_i^-) -Q(s_t, a_t; \theta_i)
+\Big)^2 \Big]$$
+where $e_t = (s_t, a_t, r_t, s_{t+1})$, $D_t = \{e_1, \dots, e_t\}$, $\gamma$
+is the discount factor and $e_t \sim U(D)$ are drawn uniformly at random from the
+pool of stored experiences. We propose a simple solution where we sample $e_t
+\sim U(D)$ and then take the previous $L$ states, $\{s_{t-(L+1)}, \dots, s_t\}$
+and zero out states from previous games. For example if $s_{t-i}$ was the end of
+the previous games then we would have states $\{\mathbf{0}, \dots, \mathbf{0},
+s_{t-(i+1)}, \dots, s_t\}$ and similarly for the next state $\{\mathbf{0}, \dots,
+\mathbf{0},s_{t-(i+1)}, \dots, s_{t+1}\}$. 
 \section{Experiments}
-Experiments.
+For our experiments we chose to play the game Q*bert. We chose Q*bert because it
+was a challenging game for DQN which achieved scores only slightly above human-level
+[0] but it wasn't so challenging that DQN could not make any progress, such as
+Montezuma's Revenge [0]. To preprocess the images we grayscale them and resize
+them to $80\times 80$. \\
+\\
 
 \section*{References}
 \small
@@ -162,7 +171,5 @@ Experiments.
 [6] "Neural Machine Translation By Jointly Learning To Align And Translate" Dzmitry Bahdanau, KyungHyun Cho, and Yoshua Bengio \\
 
 [7] "Deep Attention Recurrent Q-Network" Ivan Sorokin, Alexey Seleznev, Mikhail Pavlov, Aleksandr Fedorov, and Anastasiia Ignateva \\
-
-
 
 \end{document}
