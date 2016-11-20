@@ -66,13 +66,13 @@
 \end{abstract}
 
 \section{Introduction}
-    Recent advances in Reinforcement Learning have led to human-level or greater
+    Recent advances in reinforcement Learning have led to human-level or greater
     performance on a wide variety of games (e.g. Atari 2600 Games).  However,
     training these networks can take a long time, and the techniques presented in
-    the state of the art [add reference] perform poorly on several games that
-    require long term planning.  Deep Q-Networks learn to estimate the Q-Values
-    (long term discounted returns) of selecting each possible action from the
-    current game state. \\
+    the state of the art [0] perform poorly on several games that require long
+    term planning.  Deep Q-networks learn to estimate the Q-values (long term
+    discounted returns) of selecting each possible action from the current game
+    state. \\
     \\
     Deep Q-networks are limited in the sense that they learn a mapping from a
     limited number of past states, or game screens.  In practice, DQN is trained
@@ -82,10 +82,10 @@
     Markov decision process; all of the information needed to make an optimal
     action would no longer be contained in a single state. This is evident from
     types of games DQN performs poorly at, near or below human-level Figure 1. We
-    explore the concept of a Deep Recurrent Q-network, a combination of a Long
-    Short Term Memory (LSTM) [add reference] and a Deep Q-network (DRQN).  We wish
-    to demonstrate that introducing recurrent network architecture into the Deep
-    Q-network, the network can retain information from previous frames of the
+    explore the concept of a deep recurrent Q-network, a combination of a long
+    short term memory (LSTM) [6] and a deep Q-network (DRQN) similar to [5].  We
+    wish to demonstrate that introducing recurrent network architecture into the
+    deep Q-network, the network can retain information from previous frames of the
     game and achieve good performance on games that require long term planning. \\
 
     \begin{figure}[h]
@@ -102,7 +102,7 @@
     \end{figure}
 
     In addition, recent achievements of attention recurrent neural networks in
-    long term sequence tasks have introduced the possibility of incorporating
+    long term sequence tasks [2, 3] have introduced the possibility of incorporating
     them into the structure of teh DRQN algorithm.  The advantage of using
     attention is that it enables DRQN to focus on particular previous states it
     deems important for predicting the action in the current state. We investigate
@@ -114,8 +114,8 @@ We propose two architectures for the Deep Recurrent Q-Network (DRQN). The first
 is a very basic extension of DQN. We look at the last $L$ states, $\{s_{t-(L-1)},
 \dots, s_{t}\}$ and feed these into a convolutional neural network (CNN) to get
 intermediate outputs $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then fed into a
-RNN, $\text{RNN}(x_{t-i}) = h_{t-i}$, and the final output $h_t$ is used to
-predict the $Q$ value.
+RNN (we use an LSTM for this but it can be any RNN), $\text{RNN}(x_{t-i}) =
+h_{t-i}$, and the final output $h_t$ is used to predict the $Q$ value.
 
 \begin{figure}[h]
     \centering
@@ -156,20 +156,18 @@ them to $80\times 80$. \\
 \section*{References}
 \small
 % TODO: need to figure out how to cite this stuff properly..
-[0] "Human-level control through deep reinforcement learning" Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin Riedmiller, Andreas K. Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg \& Demis Hassabis \\
+[0] Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei A. Rusu, Joel Veness, Marc G. Bellemare, Alex Graves, Martin Riedmiller, Andreas K. Fidjeland, Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg, and Demis Hassabis. Human-level Control through Deep Reinforcement Learning. {\it Nature}, 518(7540):529-522, 2015.
 
-[1] "Playing Atari with Deep Reinforcement Learning" Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, Martin Riedmiller \\
+[1] Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra and Martin Riedmiller. Playing Atari with Deep Reinforcement Learning. {\it arXiv preprint arXiv:1312.5602}, 2013.
 
-[2] "Neural Machine Translation By Jointly Learning To Align and Translate" Dzmitry Bahdanau, Kyunghyun Cho, Yoshua Bengio \\
+[2] Dzmitry Bahdanau, Kyunghyun Cho and Yoshua Bengio. Neural Machine Translation by Jointly Learning to Align and Translate. {\it arXiv preprint arXiv:1409.0473}, 2014.
 
-[3] "Deep Recurrent Q-Learning for Partially Observable MDPs" Matthew Hausknecht and Peter Stone \\
+[3] Minh-Thang Luong, Hieu Pham and Chisopher D. Manning. Effective Approaches to Attention-based Neural Machine Translation. {\it arXiv preprint arXiv:1508.04025}, 2015.
 
-[4] "Prioritized Experience Replay" Tom Schaul, John Quan, Ioannis Antonoglou, and David Silver \\
+[4] Ivan Sorokin, Alexey Seleznev, Mikhail Pavlov, Aleksandr Fedorov and Anastasiia Ignateva. Deep Attention Recurrent Q-Network. {\it arXiv preprint arXiv:1512.01693}, 2015.
 
-[5] "Effective Approaches to Attention-based Neural Machine Translation" Minh-Thang Luong, Hieu Pham, and Christopher D. Manning \\
+[5] Matthew Hausknecht and Peter Stone. Deep Recurrent Q-Learning for Partially Observable MDPs. {\it arXiv preprint arXiv:1507.06527}, 2015.
 
-[6] "Neural Machine Translation By Jointly Learning To Align And Translate" Dzmitry Bahdanau, KyungHyun Cho, and Yoshua Bengio \\
-
-[7] "Deep Attention Recurrent Q-Network" Ivan Sorokin, Alexey Seleznev, Mikhail Pavlov, Aleksandr Fedorov, and Anastasiia Ignateva \\
+[6] Sepp Hochreiter and Jurgen Schmidhuber. Long Short-Term Memory. {\it Neural Computation}, 9(8):1735-1780, 1997.
 
 \end{document}
