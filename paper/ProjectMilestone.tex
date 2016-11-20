@@ -121,7 +121,7 @@
 
 \section{Recurrent Deep Q-Learning}
 We propose two architectures for the Recurrent Deep Q-Network (RDQN). The first
-is a very basic extension of DQN. We look at the last $L$ states, $\{s_{t-(L+1)},
+is a very basic extension of DQN. We look at the last $L$ states, $\{s_{t-(L-1)},
 \dots, s_{t}\}$ and feed these into a convolutional neural network (CNN) to get
 intermediate outputs $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then fed into a
 RNN, $\text{RNN}(x_{t-i}) = h_{t-i}$, and the final output $h_t$ is used to
@@ -134,8 +134,8 @@ predict the $Q$ value.
 \end{figure}
 
 Another architecture we used was a version of an attention RNN. For the attention
-RNN we take the $L$ hidden states outputted by the RNN, $\{h_{t-(L+1)}, \dots, h_{t}\}$
-and we take the inner product with a learned vector $v_a$, $\{v_a^Th_{t-(L+1)}, \dots,
+RNN we take the $L$ hidden states outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$
+and we take the inner product with a learned vector $v_a$, $\{v_a^Th_{t-(L-1)}, \dots,
 v_a^Th_{t}\}$. We then take a softmax over these values, $a_{t-i} =
 \text{softmax}(v_a^Th_{t-i})$. We use this softmax to take a weighted sum over
 the hidden states to get a context vector, $c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$.
