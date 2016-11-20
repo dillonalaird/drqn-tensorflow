@@ -20,6 +20,8 @@
 \usepackage{amsfonts}       % blackboard math symbols
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
+\usepackage{amsmath}
+\usepackage{amssymb}
 
 \title{Deep Q-Learning with Recurrent Neural Networks}
 
@@ -77,7 +79,12 @@ is one way to overcome DQNs difficulties with learning policies that require lon
 term information. We investigate augmenting DQN architecture proposed in [0], utilizing
 a convolutional neural network (CNN), with an RNN.
 \section{Recurrent Deep Q-Learning}
-DQN
+We propose two architectures for the Recurrent Deep Q-Network (RDQN). The first
+is a very basic extension of DQN. We look at the last $L$ states, $\{s_{t-L},
+\dots, s_{t}\}$ and feed these into a convolutional neural network (CNN) to get
+intermediate outputs $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then fed into a
+RNN, $\text{RNN}(x_{t-i}) = h_{t-i}$, and the final output $h_t$ is used to
+predict the $Q$ value.
 \section{Experiments}
 Experiments.
 \section*{References}
