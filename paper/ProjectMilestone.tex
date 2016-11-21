@@ -74,7 +74,7 @@
     discounted returns) of selecting each possible action from the current game
     state. \\
     \\
-    Deep Q-networks are limited in the sense that they learn a mapping from a
+    Deep Q-networks are limited in that they learn a mapping from a
     limited number of past states, or game screens.  In practice, DQN is trained
     using an input consisting of the last four game screens.  Thus, DQN performs
     poorly at games that require the agent to remember information more than four
@@ -83,8 +83,8 @@
     action would no longer be contained in a single state. This is evident from
     types of games DQN performs poorly at, near or below human-level Figure 1. We
     explore the concept of a deep recurrent Q-network, a combination of a long
-    short term memory (LSTM) [6] and a deep Q-network (DRQN) similar to [5].  We
-    wish to demonstrate that introducing recurrent network architecture into the
+    short term memory (LSTM) [6] and a deep recurrent Q-network (DRQN) similar to [5].  We
+    wish to demonstrate with the introduction of recurrent network architecture into the
     deep Q-network, the network can retain information from previous frames of the
     game and achieve good performance on games that require long term planning. \\
 
@@ -103,7 +103,7 @@
 
     In addition, recent achievements of attention recurrent neural networks in
     long term sequence tasks [2, 3] have introduced the possibility of incorporating
-    them into the structure of teh DRQN algorithm.  The advantage of using
+    them into the structure of the DRQN architecture.  The advantage of using
     attention is that it enables DRQN to focus on particular previous states it
     deems important for predicting the action in the current state. We investigate
     augmenting DRQN with attention and evaluate its usefulness. \\
@@ -120,7 +120,7 @@ h_{t-i}$, and the final output $h_t$ is used to predict the $Q$ value.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.5]{RDQN}
-    \caption{Architecutre of the RDQN}
+    \caption{Architecture of the DRQN}
 \end{figure}
 
 Another architecture we used was a version of an attention RNN. For the attention
@@ -142,16 +142,21 @@ is the discount factor and $e_t \sim U(D)$ are drawn uniformly at random from th
 pool of stored experiences. We propose a simple solution where we sample $e_t
 \sim U(D)$ and then take the previous $L$ states, $\{s_{t-(L+1)}, \dots, s_t\}$
 and zero out states from previous games. For example if $s_{t-i}$ was the end of
-the previous games then we would have states $\{\mathbf{0}, \dots, \mathbf{0},
+the previous game then we would have states $\{\mathbf{0}, \dots, \mathbf{0},
 s_{t-(i+1)}, \dots, s_t\}$ and similarly for the next state $\{\mathbf{0}, \dots,
-\mathbf{0},s_{t-(i+1)}, \dots, s_{t+1}\}$. 
+\mathbf{0},s_{t-(i+1)}, \dots, s_{t+1}\}$.
+
+
 \section{Experiments}
-For our experiments we chose to play the game Q*bert. We chose Q*bert because it
-was a challenging game for DQN which achieved scores only slightly above human-level
-[0] but it wasn't so challenging that DQN could not make any progress, such as
-Montezuma's Revenge [0]. To preprocess the images we grayscale them and resize
-them to $80\times 80$. \\
+For our experiments, we chose to play the game Q*bert. We chose Q*bert because it
+is a challenging game for DQN, which achieved scores only slightly above human-level
+[0]. However, it wasn't so challenging that DQN could not make any progress, versus a game such as
+Montezuma's Revenge [0]. \\
+\\ 
+For input, the RNN-CNN network takes 4 $80 \times 80$ preprocessed game screen images. (We will experiment with a reduced state space of 3 or 2 game screens in the future to show that reducing the state space does not degrade performance). The first hidden layer convolves 16 $19 \times 19$ filters with stride 8 across the input image and applies a rectifier nonlinearly.  The second hidden layer convolves 32 $8 \times 8$ filters with stride 4, again followed by a rectifier nonlinearily.  Convolutional outputs are fed to the fully connected LSTM layer.  Finally, a fully connected linear layer outputs a Q-value for each possible action. \\
 \\
+Episodes are selected randomly from the replay memory and updates begin at the beginning of the episode and proceed forward through time to the conclusion of the episode. The targets at each time step are generated from the target Q-network.  The RNN?s hidden state is carried forward throughout the episode.  \\
+
 
 \section*{References}
 \small
