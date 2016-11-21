@@ -155,7 +155,7 @@ Montezuma's Revenge [0]. \\
 \\ 
 For input, the RNN-CNN network takes 4 $80 \times 80$ preprocessed game screen images. (We will experiment with a reduced state space of 3 or 2 game screens in the future to show that reducing the state space does not degrade performance). The first hidden layer convolves 16 $19 \times 19$ filters with stride 8 across the input image and applies a rectifier nonlinearly.  The second hidden layer convolves 32 $8 \times 8$ filters with stride 4, again followed by a rectifier nonlinearily.  Convolutional outputs are fed to the fully connected LSTM layer.  Finally, a fully connected linear layer outputs a Q-value for each possible action. \\
 \\
-Episodes are selected randomly from the replay memory and updates begin at the beginning of the episode and proceed forward through time to the conclusion of the episode. The targets at each time step are generated from the target Q-network.  The RNN?s hidden state is carried forward throughout the episode.  \\
+Episodes are selected randomly from the replay memory and updates begin at the beginning of the episode and proceed forward through time to the conclusion of the episode. The targets at each time step are generated from the target Q-network.  The RNN's hidden state is carried forward throughout the episode.  \\
 
 
 \section*{References}
