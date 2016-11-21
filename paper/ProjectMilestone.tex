@@ -160,9 +160,9 @@ was a challenging game for DQN which achieved scores only slightly above human-l
 Montezuma's Revenge [0]. \\
 \\
 For input the DQRN takes a specified number of screens per state. The screen images
-are grayscaled and resized to $80 \times 80$. The first hidden layer convolves $16$
+are grayscaled and resized to $80 \times 80$. The first hidden layer convolves $16$,
 $19 \times 19$ filters with stride 8 across the input image and applies a rectified
-linear unit.  The second hidden layer convolves $32$ $8 \times 8$ filters with
+linear unit.  The second hidden layer convolves $32$, $8 \times 8$ filters with
 stride $4$, again followed by a rectified linear unit.  Convolutional outputs are
 fed to the fully connected LSTM layer.  Finally, a fully connected linear layer
 outputs a Q-value for each possible action. \\
