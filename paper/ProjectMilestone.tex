@@ -212,7 +212,7 @@ models for, to get good data, is at least $1$ week.
         \centering
         \includegraphics[scale=0.4]{attention-episode_avg_reward}
     \end{minipage}
-    \caption{Graphs for Q*bert With 1-layer and 2-layer Attention}
+    \caption{Graphs for Q*bert With 1-layer and 2-layer RNN and Attention}
 \end{figure}
 
 In Figure 4, an experiment has been run using the DRQN architecture with one and two layer RNN component. Both models are DRQN with $L = 8$, with 2 frames per state and attention. The orange line represents the model with 1-layer RNN and the light blue line represents the model with 2-layer RNN. As can be seen, there isn't much difference between the models, with the 2-layer RNN model performing slightly better on the three measures. However, note that the 2-layer RNN has more difficulty minimizing loss than the 1-layer RNN after 1.8 million iterations. \\
