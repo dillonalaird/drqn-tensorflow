@@ -156,17 +156,54 @@ s_{t-(i+1)}, \dots, s_t\}$ and similarly for the next state $\{\mathbf{0}, \dots
 \section{Experiments}
 For our experiments we chose to play the game Q*bert. We chose Q*bert because it
 was a challenging game for DQN which achieved scores only slightly above human-level
-[0] but it wasn't so challenging that DQN could not make any progress, such as
+[0] but it was not so challenging that DQN could not make any progress, such as
 Montezuma's Revenge [0]. \\
 \\
-For input the DQRN takes a specified number of screens per state. The screen images
+For input the DRQN takes a specified number of screens per state. The screen images
 are grayscaled and resized to $80 \times 80$. The first hidden layer convolves $16$,
 $19 \times 19$ filters with stride 8 across the input image and applies a rectified
 linear unit.  The second hidden layer convolves $32$, $8 \times 8$ filters with
 stride $4$, again followed by a rectified linear unit.  Convolutional outputs are
-fed to the fully connected LSTM layer.  Finally, a fully connected linear layer
-outputs a Q-value for each possible action. \\
+fed to an LSTM with $256$ hidden units per layer.  Finally, a fully connected
+linear layer outputs a Q-value for each possible action. \\
 \\
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{1.0\textwidth}
+        \centering
+        \includegraphics[scale=0.4]{avg_loss}
+        \centering
+        \includegraphics[scale=0.4]{avg_q}
+        \centering
+        \includegraphics[scale=0.4]{episode_avg_reward}
+    \end{minipage}
+    \caption{Graphs for Q*bert Over Iterations}
+\end{figure}
+
+In Figure 3, the orange line is a regular DQN architecture with an CNN and $4$
+frames per state. The light blue line is a DRQN with $L=4$ and $1$ frame per state.
+The pink line is an DRQN with $L=4$ and $2$ frames per state. The blue line is a
+DRQN with $L=8$ and $1$ frames per state and the green line is a DRQN with $L=8$,
+$2$ frames per state and attention. \\
+\\
+We can see from the graphs that blue seems to be performing the best in terms of
+average reward per episode. It also has the highest q value. Green, which is just
+blue with attention, performs slightly worse than blue but has a very difficult
+time minimizing loss. This tells us that our basic linear attention does not do
+much to help the model. A better attention mechanism conditioned on the most recent
+state might work better. Curiously, green's average reward per episode takes a
+dip after $900$ thousand iterations below all the other models. It is apparent
+that for smaller $L$, DRQN performs basically the same as a regular DQN but has a
+slightly more difficult time minimizing the loss. \\
+\\
+From the average reward per episodes the graphs still seem too noisy to give any
+significant indication that one model is doing better than another. One way to
+get better data is to run the models longer but unfortunately we did not have
+enough time to experiment with a large number of parameters and run the models
+longer. The green model, the DRQN with attention, ran for almost $2$ days to get
+to $1$ million iterations. We predict an appropriate amount of time to run the
+models for, to get good data, is at least $1$ week.
 
 \section*{References}
 \small
