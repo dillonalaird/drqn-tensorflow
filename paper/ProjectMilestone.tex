@@ -197,10 +197,6 @@ dip after $900$ thousand iterations below all the other models. It is apparent
 that for smaller $L$, DRQN performs basically the same as a regular DQN but has a
 slightly more difficult time minimizing the loss. \\
 \\
-From the average reward per episodes the graphs still seem too noisy to give any
-significant indication that one model is doing better than another. The green model, the DRQN with attention, ran for almost $2$ days to get
-to $1$ million iterations. We predict an appropriate amount of time to run the
-models for, to get good data, is at least $1$ week.
 
 \begin{figure}[h]
     \centering
@@ -215,10 +211,21 @@ models for, to get good data, is at least $1$ week.
     \caption{Graphs for Q*bert With 1-layer and 2-layer RNN and Attention}
 \end{figure}
 
-In Figure 4, an experiment has been run using the DRQN architecture with one and two layer RNN component. Both models are DRQN with $L = 8$, with 2 frames per state and attention. The orange line represents the model with 1-layer RNN and the light blue line represents the model with 2-layer RNN. As can be seen, there isn't much difference between the models, with the 2-layer RNN model performing slightly better on the three measures. However, note that the 2-layer RNN has more difficulty minimizing loss than the 1-layer RNN after 1.8 million iterations. \\
+In Figure 4, an experiment has been run using the DRQN architecture with one and
+two layer RNN component. Both models are DRQN with $L = 8$, with $2$ frames per
+state and attention. The orange line represents the model with 1-layer RNN and
+the light blue line represents the model with 2-layer RNN. As can be seen, there
+is not much difference between the models, with the 2-layer RNN model performing
+slightly better on the three measures. However, note that the 2-layer RNN has more 
+difficulty minimizing loss than the 1-layer RNN after $1.8$ million iterations. \\
 \\
-Both DRQN models have similar performance to the earlier models utilizing DQN with CNN and the DRQN at the start. However, they were run twice as long and have a dramatic increase in performance after 1 million iterations. This indicates that future experiments will need a lengthier training period before they can be properly evaluated or utilized. Unfortunately, we did not have
-enough time to experiment with a large number of parameters and run the models longer. This will be done in the second phase of the project.
+Both DRQN models have similar performance to the earlier models utilizing DQN with
+CNN and the DRQN at the start. However, they were run twice as long and have a
+dramatic increase in performance after 1 million iterations. This indicates that
+future experiments will need a lengthier training period before they can be
+properly evaluated or utilized. Unfortunately, we did not have enough time to
+experiment with a large number of parameters and run the models longer. This will
+be done in the second phase of the project.
 
 \section*{References}
 \small
