@@ -10,7 +10,7 @@ class RNNCNN(Network):
                  history_length,
                  num_steps,
                  num_layers,
-                 use_attention,
+                 attention,
                  observation_dims,
                  output_size,
                  trainable=True,
@@ -58,15 +58,34 @@ class RNNCNN(Network):
                 layers.append(l3)
 
         with tf.variable_scope(name):
-            self.va   = tf.get_variable("va", shape=[256])
-            self.cell = tf.nn.rnn_cell.LSTMCell(256)
-            self.cell = tf.nn.rnn_cell.MultiRNNCell([self.cell]*num_layers)
-            outputs, state = tf.nn.dynamic_rnn(self.cell, tf.pack(layers),
+            cell = tf.nn.rnn_cell.LSTMCell(256)
+            cell = tf.nn.rnn_cell.MultiRNNCell([cell]*num_layers)
+            outputs, state = tf.nn.dynamic_rnn(cell, tf.pack(layers),
                                                dtype=tf.float32, time_major=True)
-            if use_attention:
-                # TODO: va*tanh(W*ht)? this is just linear, maybe concat last
-                # hidden state/most recent?
-                scores = tf.reduce_sum(tf.mul(outputs, self.va), 2)
+            # grab MultiRNNCell variables
+            for v in tf.all_variables():
+                if v.name.startswith(name + '/RNN/MultiRNNCell/'):
+                    self.var[v.name.replace(name + '/', '')] = v
+
+            if not attention:
+                layer = outputs[-2]
+            elif attention.lower() == 'global':
+                assert num_steps > 1
+                self.var['Wc'] = tf.get_variable('Wc', shape=[2*256, 256])
+                self.var['bc'] = tf.get_variable('bc', shape=[256])
+
+                h_t = outputs[-1]
+                encode = tf.pack(outputs[:-1])
+                scores = tf.reduce_sum(tf.mul(encode, h_t), 2)
+                a_t    = tf.nn.softmax(tf.transpose(scores))
+                a_t    = tf.expand_dims(a_t, 2)
+                c_t    = tf.batch_matmul(tf.transpose(encode, perm=[1,2,0]), a_t)
+                c_t    = tf.squeeze(c_t, [2])
+                layer  = tf.tanh(tf.matmul(tf.concat(1, [h_t, c_t]), self.var['Wc']) + self.var['bc'])
+            elif attention.lower() == 'linear':
+                self.var['va'] = tf.get_variable('va', shape=[256])
+
+                scores = tf.reduce_sum(tf.mul(outputs, self.var['va']), 2)
                 a_t = tf.nn.softmax(tf.transpose(scores))
                 a_t = tf.expand_dims(a_t, 2)
                 c_t = tf.batch_matmul(tf.transpose(outputs, perm=[1,2,0]), a_t)
@@ -74,8 +93,7 @@ class RNNCNN(Network):
                 # TODO: extra nonlinearity?
                 layer = c_t
             else:
-                layer = outputs[-1]
-
+                raise ValueError('uknown attention: {}'.format(attention))
             self.build_output_ops(layer, network_output_type,
                     value_hidden_sizes, advantage_hidden_sizes, output_size,
                     weights_initializer, biases_initializer, hidden_activation_fn,
