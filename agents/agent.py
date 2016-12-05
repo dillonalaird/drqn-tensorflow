@@ -73,8 +73,8 @@ class Agent(object):
 
         for self.t in tqdm(range(start_t, t_max), ncols=70, initial=start_t):
             ep = (self.ep_end +
-                    max(0., (self.ep_start - self.ep_end)
-                        * (self.t_ep_end - max(0., self.t - self.t_learn_start)) / self.t_ep_end))
+                  max(0., (self.ep_start - self.ep_end)
+                      * (self.t_ep_end - max(0., self.t - self.t_learn_start)) / self.t_ep_end))
 
             # 1. predict
             action = self.predict(self.history.get(), ep)
@@ -118,7 +118,7 @@ class Agent(object):
                 # 1. predict
                 action = self.predict(self.history.get(), test_ep)
                 # 2. act
-                observation, reward, terminal, info = self.env.step(action, is_training=True)
+                observation, reward, terminal, info = self.env.step(action, is_training=False)
                 # 3. observe
                 q, loss, is_update = self.observe(observation, reward, action, terminal)
 
