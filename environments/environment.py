@@ -64,6 +64,9 @@ class AtariEnvironment(Environment):
                                                data_format, display)
 
     def new_game(self, from_random_game=False):
+        # https://github.com/openai/rllab/issues/56
+        if hasattr(self.env.monitor, 'stats_recorder'):
+            self.env.monitor.stats_recorder.done = True
         screen = self.env.reset()
         screen, reward, terminal, _ = self.env.step(0)
 
