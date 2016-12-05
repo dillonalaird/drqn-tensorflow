@@ -107,11 +107,12 @@
     them into the structure of the DRQN architecture.  The advantage of using
     attention is that it enables DRQN to focus on particular previous states it
     deems important for predicting the action in the current state. We investigate
-    augmenting DRQN with attention and evaluate its usefulness. \\
+    augmenting DRQN with attention and evaluate its usefulness.
 
+\section{Background}
 
 \section{Deep Recurrent Q-Learning}
-We propose two architectures for the Deep Recurrent Q-Network (DRQN). The first
+We propose three architectures for the Deep Recurrent Q-Network (DRQN). The first
 is a very basic extension of DQN. Depicted in Figure 1, the architecture of DRQN
 augments DQN's fully connected layer with a LSTM. We accomplish this by looking
 at the last $L$ states, $\{s_{t-(L-1)}, \dots, s_{t}\}$ and feed these into a
@@ -127,15 +128,26 @@ $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
     \caption{Architecture of the DRQN}
 \end{figure}
 
-Another architecture we used was a version of an attention RNN. For the attention
-RNN we take the $L$ hidden states outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$
-and calculate an inner product with $v_a$, $\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_{t}\}$.
-This allows us to focus more on nearby hidden states or further away states depending
-on what values of $v_a$ are learned. We then take a softmax over these values,
+The second architecture we used was a version of an attention RNN we are calling
+linear attention. For the linear attention RNN we take the $L$ hidden states
+outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$ and calculate an inner
+product with $v_a$, $\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_{t}\}$. This allows the
+model to focus more on nearby hidden states or further away states depending on
+what values of $v_a$ are learned. We then take a softmax over these values,
 $a_{t-i} = \text{softmax}(v_a^Th_{t-i})$. We use this softmax to take a weighted
-sum over the hidden states to get a context vector, $c_t =
-\sum_{i=0}^{L-1}a_{t-i}h_{t-i}$. This context vector is then used to predict the
-$Q$ value. \\
+sum over the hidden states to get a context vector, $c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$.
+This context vector is then used to predict the $Q$ value. \\
+\\
+The third architecture we used is global attention, similar to the global attention
+used in [3]. We treat the current state, $s_t$ as the "decoder" input and the
+previous $L - 2$ states as the "encoder" inputs. We compute the following scores,
+$\{h_{t-(L-1)}h_t, \dots, h_{t-1}h_t\}$. We then take a softmax over these values,
+$a_{t-i} = \text{softmax}(h_{t-i}h_t)$. The context vector is computed as a weighted
+sum over the previous hidden states, $c_t = \sum_{i=1}^{L-1}a_{t-i}h_{t-i}$.
+Finally the context vector is used to compute $\tilde{h} = \tanh(W_a[h_t;c_t] + b_a)$
+which is then used to predict the $Q$ value. This type of attention allows the model
+to focus on previous states depending on the current state $h_t$ as opposed to a
+fixed vector such as $v_a$.\\
 \\
 Learning sequences of observations creates some difficulty when sampling experiences
 and using the following loss function [0]:
