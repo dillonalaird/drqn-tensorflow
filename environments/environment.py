@@ -120,7 +120,8 @@ class AtariEnvironment(Environment):
         return self.preprocess(screen, terminal), cumulated_reward, terminal, {}
 
     def preprocess(self, raw_screen, terminal):
-        y = 0.2126 * raw_screen[:, :, 0] + 0.7152 * raw_screen[:, :, 1] + 0.0722 * raw_screen[:, :, 2]
+        #y = 0.2126 * raw_screen[:, :, 0] + 0.7152 * raw_screen[:, :, 1] + 0.0722 * raw_screen[:, :, 2]
+        y = 0.333*raw_screen[:,:,0] + 0.333*raw_screen[:,:,1] + 0.333*raw_screen[:,:,2]
         y = y.astype(np.uint8)
         y_screen = imresize(y, tuple(self.observation_dims))
         return y_screen
