@@ -65,25 +65,23 @@
 \begin{column}{\onecolwid} % The first column
 
 %----------------------------------------------------------------------------------------
-%	OBJECTIVES
+%	BACKGROUND
 %----------------------------------------------------------------------------------------
 
 \begin{alertblock}{Abstract}
-Deep reinforcement learning models have proven to be successful at learning
-control policies image inputs. They have, however, struggled with learning
-policies that require longer term information. Recurrent neural network
-architectures have be used in tasks dealing with longer term dependencies
-between data points. We investigate these architectures to overcome the
-difficulties arising from learning policies with long term dependencies.
+    Deep reinforcement learning models have proven to be successful at learning
+    control policies image inputs. They have, however, struggled with learning
+    policies that require longer term information. Recurrent neural network
+    architectures have be used in tasks dealing with longer term dependencies
+    between data points. We investigate these architectures to overcome the
+    difficulties arising from learning policies with long term dependencies.
 \end{alertblock}
 
-%----------------------------------------------------------------------------------------
-%	QUICK REVISION
-%----------------------------------------------------------------------------------------
+%------------------------------------------------
 
 \begin{block}{Introduction}
     \begin{itemize}
-        \item Recent advances in reinforcement Learning have led to human-level
+        \item Recent advances in reinforcement learning have led to human-level
               or greater performance on a wide variety of games (e.g. Atari 2600
               Games). 
         \item Deep Q-networks are limited in that they learn a mapping from a single
@@ -91,7 +89,7 @@ difficulties arising from learning policies with long term dependencies.
         \item We explore the concept of a deep recurrent Q-network (DRQN), a
               combination of a recurrent neural network (RNN) and a deep
               Q-network (DQN) 
-        \item In addition to vanilla RNN architectures we also examine augmented RNN
+        \item In addition to standard RNN architectures we also examine augmented RNN
               architectures such as attention RNNs. 
     \end{itemize}
 \end{block}
@@ -110,11 +108,6 @@ difficulties arising from learning policies with long term dependencies.
     \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
 \end{figure}
 
-%\begin{figure}
-%\includegraphics[width=0.8\linewidth]{1.jpg}
-%\caption{Graph of $f(x)=ax^2|_{\{0.1, 0.3, 1.0, 3.0\}}$}
-%\end{figure}
-
 %----------------------------------------------------------------------------------------
 
 \end{column} % End of the first column
@@ -128,51 +121,8 @@ difficulties arising from learning policies with long term dependencies.
 \begin{column}{\onecolwid}\vspace{-.6in} % The first column within column 2 (column 2.1)
 
 %----------------------------------------------------------------------------------------
-%	MATERIALS
+%	ALGORITHMS
 %----------------------------------------------------------------------------------------
-
-\begin{block}{Background}
-
-%\begin{enumerate}
-%\item Rearrange the equation into the standard $ax^2+bx+c$ form.
-%\item Write down two brackets: $(x\ \ \ )(x\ \ \ )$
-%\item Find two numbers that multiply to give 'c' and add or subtract to give 'b' (ignoring signs).
-%\item Put the numbers in brackets and choose their signs.
-%\end{enumerate}
-
-\end{block}
-
-%----------------------------------------------------------------------------------------
-
-\end{column} % End of column 2.1
-
-\begin{column}{\onecolwid}\vspace{-.6in} % The second column within column 2 (column 2.2)
-
-%----------------------------------------------------------------------------------------
-%	P
-%----------------------------------------------------------------------------------------
-
-\begin{block}{Attention Deep Recurrent Q-Learning}
-\end{block}
-\end{column} % End of column 2.2
-
-
-\end{columns} % End of the split of column 2 - any content after this will now take up 2 columns width
-
-%\begin{figure}
-%    \includegraphics[width=0.4\linewidth]{DRQN_attn}
-%    \caption{Architecture of the Attention DRQN}
-%\end{figure}
-
-\begin{alertblock}{Box}
-Text or image?
-\end{alertblock} 
-
-%----------------------------------------------------------------------------------------
-
-\begin{columns}[t,totalwidth=\twocolwid] % Split up the two columns wide column again
-
-\begin{column}{\onecolwid} % The first column within column 2 (column 2.1)
 
 \begin{block}{Deep Recurrent Q-Learning}
 \begin{itemize}
@@ -192,16 +142,62 @@ Text or image?
 
 \end{column} % End of column 2.1
 
+\begin{column}{\onecolwid}\vspace{-.6in} % The second column within column 2 (column 2.2)
+
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Attention Deep Recurrent Q-Learning}
+\begin{itemize}
+        \item We have utilized linear attention.
+        \item We have utilized global attention.
+\end{itemize}
+
+\end{block}
+
+\end{column} % End of column 2.2
+
+\end{columns} % End of the split of column 2 - any content after this will now take up 2 columns width
+
+%----------------------------------------------------------------------------------------
+%	EXPERIMENTS
+%----------------------------------------------------------------------------------------
+
+\begin{column}{\twocolwid}
+
+\begin{block}{Experiments}
+\end{block}
+
+\end{column}
+
+\begin{columns}[t,totalwidth=\twocolwid] % Split up the two columns wide column again
+
+\begin{column}{\onecolwid} % The first column within column 2 (column 2.1)
+
+\begin{itemize}
+    \item Basic DQN
+    \item Basic RDQN
+\end{itemize}
+
+%----------------------------------------------------------------------------------------
+
+\end{column} % End of column 2.1
+
 \begin{column}{\onecolwid} % The second column within column 2 (column 2.2)
 
-\begin{block}{Title}
-\end{block}
+\begin{itemize}
+    \item RDQN with linear attention.
+    \item RDQN with global attention.
+\end{itemize}
 
 %----------------------------------------------------------------------------------------
 
 \end{column} % End of column 2.2
 
 \end{columns} % End of the split of column 2
+
+\begin{alertblock}{Box}
+    Text or image?
+\end{alertblock} 
 
 \end{column} % End of the second column
 
@@ -210,55 +206,49 @@ Text or image?
 \begin{column}{\onecolwid} % The third column
 
 %----------------------------------------------------------------------------------------
-%	CONCLUSION
+%	RESULTS
 %----------------------------------------------------------------------------------------
 
-\begin{block}{Title}
-\end{block}
+\begin{block}{Results}
 
+% SCORE TABLE
+\begin{gather*}
+	Q^{\ast}bert Scores
+\end{gather*}
 
-%----------------------------------------------------------------------------------------
-%	ACKNOWLEDGEMENTS
-%----------------------------------------------------------------------------------------
-
-\setbeamercolor{block title}{fg=red,bg=white} % Change the block title color
-
-\begin{block}{References}
-
-% table
-
-%\begin{table}
-%\vspace{2ex}
-%\begin{tabular}{l l l l}
-%\toprule
-%\textbf{verb} & \textbf{noun} & \textbf{meaning}\\
-%\midrule
-%add & addition & $+$ \\
-%subtract & subtraction & $-$ \\
-%multiply & multiplication & $\cdot$ \\
-%divide & division & $\div$ \\
-%solve & solution & getting answer \\
-%substitute & substitution & $t=x^2$ \\
-%\bottomrule
-%\end{tabular}
-%\caption{Word Formation}
-%\end{table}
-
+\begin{table}
+    \vspace{2ex}
+    \begin{tabular}{l l l}
+        \toprule
+            \textbf{Algorithms} & \textbf{Scores} \\
+        \midrule
+            Random & 157 \\
+            Sarsa & 614 \\
+            Contingency & 960 \\
+            DQN & \textbf{1952} \\
+            Human & 18900 \\
+        \midrule
+            HNeat Best & 1800 \\
+            HNeat Pixel & 1325 \\
+            DQN Best & \textbf{4500} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \end{block}
 
-% orange box
-%\setbeamercolor{block alerted title}{fg=black,bg=norange} % Change the alert block title colors
-%\setbeamercolor{block alerted body}{fg=black,bg=white} % Change the alert block body colors
+%----------------------------------------------------------------------------------------
+%	DISCUSSION
+%----------------------------------------------------------------------------------------
 
-\begin{alertblock}{Box}
+\begin{block}{Discussion}
 
-\begin{itemize}
-    \item item
-\end{itemize}
+    \begin{itemize}
+        \item Conclusions
+        \item Future work
+    \end{itemize}
 
-\end{alertblock}
-
+\end{block}
 
 %----------------------------------------------------------------------------------------
 
