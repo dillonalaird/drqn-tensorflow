@@ -114,8 +114,8 @@ connected layer with a LSTM. We accomplish this by looking at the last $L$ state
 $\{s_{t-(L-1)}, \dots, s_{t}\}$ and feed these into a convolutional neural network
 (CNN) to get intermediate outputs $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then
 fed into a RNN (we use an LSTM for this but it can be any RNN),
-$\text{RNN}(x_{t-i}) = h_{t-i}$, and the final output $h_t$ is used to predict
-the $Q$ value which is now a function of $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
+$\text{RNN}(x_{t-i}, h_{t-i-1}) = h_{t-i}$, and the final output $h_t$ is used to
+predict the $Q$ value which is now a function of $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
 
 \begin{figure}[h]
     \centering
