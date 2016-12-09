@@ -67,27 +67,23 @@
 
 \section{Introduction}
     Recent advances in reinforcement Learning have led to human-level or greater
-    performance on a wide variety of games (e.g. Atari 2600 Games).  However,
+    performance on a wide variety of games (e.g. Atari 2600 Games). However,
     training these networks can take a long time, and the techniques presented in
     the state of the art [0] perform poorly on several games that require long
-    term planning.  Deep Q-networks learn to estimate the Q-values (long term
-    discounted returns) of selecting each possible action from the current game
-    state. \\
+    term planning. \\
     \\
-    Deep Q-networks are limited in that they learn a mapping from a
-    limited number of past states, or game screens.  In practice, DQN is trained
-    using an input consisting of the last four game screens.  Thus, DQN performs
-    poorly at games that require the agent to remember information more than four
-    screens ago.  In other words, the game could no longer be modeled as a true
-    Markov decision process; all of the information needed to make an optimal
-    action would no longer be contained in a single state. This is evident from
-    types of games DQN performs poorly at, near or below human-level Figure 1. We
-    explore the concept of a deep recurrent Q-network, a combination of a long
-    short term memory (LSTM) [6] and a deep recurrent Q-network (DRQN) similar to
-    [5].  We wish to demonstrate with the introduction of recurrent network
-    architecture into the deep Q-network, the network can retain information from
-    previous frames of the game and achieve good performance on games that require
-    long term planning. \\
+    Deep Q-networks are limited in that they learn a mapping from a single
+    previous state which constist of a small number of game screens. In practice,
+    DQN is trained using an input consisting of the last four game screens. Thus,
+    DQN performs poorly at games that require the agent to remember information
+    more than four screens ago. This is evident from the types of games DQN performs
+    poorly at, near or below human-level, in Figure 1. \\
+    \\
+    We explore the concept of a deep recurrent Q-network (DRQN), a combination of
+    a recurrent neural network (RNN) [6] and a deep Q-network (DQN) similar to [5].
+    The idea being that the RNN will be able to retain information from states
+    further back in time and incorporate that into predicting better Q values
+    and thus performing better on games that require long term planning. \\
 
     \begin{figure}[h]
         \centering
@@ -102,25 +98,24 @@
         \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
     \end{figure}
 
-    In addition, recent achievements of attention recurrent neural networks in
-    long term sequence tasks [2, 3] have introduced the possibility of incorporating
-    them into the structure of the DRQN architecture.  The advantage of using
-    attention is that it enables DRQN to focus on particular previous states it
-    deems important for predicting the action in the current state. We investigate
+    In addition to vanilla RNN architectures we also examine augmented RNN
+    architectures such as attention RNNs. Recent achievments of attention RNNs in
+    translation tasks [2, 3] have shown promise. The advantage of using attention
+    is that it enables DRQN to focus on particular previous states it deems
+    important for predicting the action in the current state. We investigate
     augmenting DRQN with attention and evaluate its usefulness.
 
 \section{Background}
 
 \section{Deep Recurrent Q-Learning}
 We propose three architectures for the Deep Recurrent Q-Network (DRQN). The first
-is a very basic extension of DQN. Depicted in Figure 1, the architecture of DRQN
-augments DQN's fully connected layer with a LSTM. We accomplish this by looking
-at the last $L$ states, $\{s_{t-(L-1)}, \dots, s_{t}\}$ and feed these into a
-convolutional neural network (CNN) to get intermediate outputs
-$\text{CNN}(s_{t-i}) = x_{t-i}$. These are then fed into a RNN (we use an LSTM
-for this but it can be any RNN), $\text{RNN}(x_{t-i}) = h_{t-i}$, and the final
-output $h_t$ is used to predict the $Q$ value which is now a function of
-$Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
+is a very basic extension of DQN. The architecture of DRQN augments DQN's fully
+connected layer with a LSTM. We accomplish this by looking at the last $L$ states,
+$\{s_{t-(L-1)}, \dots, s_{t}\}$ and feed these into a convolutional neural network
+(CNN) to get intermediate outputs $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then
+fed into a RNN (we use an LSTM for this but it can be any RNN),
+$\text{RNN}(x_{t-i}) = h_{t-i}$, and the final output $h_t$ is used to predict
+the $Q$ value which is now a function of $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
 
 \begin{figure}[h]
     \centering
@@ -128,29 +123,30 @@ $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
     \caption{Architecture of the Attention DRQN}
 \end{figure}
 
-The second architecture we used was a version of an attention RNN we are calling
-linear attention. For the linear attention RNN we take the $L$ hidden states
-outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$ and calculate an inner
-product with $v_a$, $\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_{t}\}$. This allows the
-model to focus more on nearby hidden states or further away states depending on
-what values of $v_a$ are learned. We then take a softmax over these values,
-$a_{t-i} = \text{softmax}(v_a^Th_{t-i})$. We use this softmax to take a weighted
-sum over the hidden states to get a context vector, $c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$.
-This context vector is then used to predict the $Q$ value. \\
+The second architecture we used was a version of an attention RNN, depicted in
+Figure 2, we are calling linear attention. For the linear attention RNN we take
+the $L$ hidden states outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$ and
+calculate an inner product with $v_a$, $\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_{t}\}$.
+This allows the model to focus more on nearby hidden states or further away states
+depending on what values of $v_a$ are learned. We then take a softmax over these
+values, $a_{t-i} = \text{softmax}(v_a^Th_{t-i})$. We use this softmax to take a weighted
+sum over the hidden states to get a context vector,
+$c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$. This context vector is then used to predict
+the $Q$ value. \\
 \\
 The third architecture we used is global attention, similar to the global attention
 used in [3]. We treat the current state, $s_t$ as the "decoder" input and the
 previous $L - 2$ states as the "encoder" inputs. We compute the following scores,
-$\{{h_{t-(L-1)}}^Th_t, \dots, {h_{t-1}}^Th_t\}$. We then take a softmax over these values,
-$a_{t-i} = \text{softmax}({h_{t-i}}^Th_t)$. The context vector is computed as a weighted
-sum over the previous hidden states, $c_t = \sum_{i=1}^{L-1}a_{t-i}h_{t-i}$.
+$\{{h_{t-(L-1)}}^Th_t, \dots, {h_{t-1}}^Th_t\}$. We then take a softmax over these
+values, $a_{t-i} = \text{softmax}({h_{t-i}}^Th_t)$. The context vector is computed
+as a weighted sum over the previous hidden states, $c_t = \sum_{i=1}^{L-1}a_{t-i}h_{t-i}$.
 Finally the context vector is used to compute $\tilde{h} = \tanh(W_a[h_t;c_t] + b_a)$
 which is then used to predict the $Q$ value. This type of attention allows the model
 to focus on previous states depending on the current state $h_t$ as opposed to a
-fixed vector such as $v_a$.\\
+fixed vector such as $v_a$. \\
 \\
-Learning sequences of observations creates some difficulty when sampling experiences
-and using the following loss function [0]:
+Learning sequences of observations creates some difficulty when sampling
+experiences and using the following loss function [0]:
 $$L_i(\theta_i) = \mathbb{E}_{e_t \sim U(D)}
 \Big[\Big(
 r_t + \gamma \max_{a_t'}Q(s_{t+1}, a_t'; \theta_i^-) -Q(s_t, a_t; \theta_i)
@@ -163,7 +159,6 @@ and zero out states from previous games. For example if $s_{t-i}$ was the end of
 the previous game then we would have states $\{\mathbf{0}, \dots, \mathbf{0},
 s_{t-(i+1)}, \dots, s_t\}$ and similarly for the next state $\{\mathbf{0}, \dots,
 \mathbf{0},s_{t-(i+2)}, \dots, s_{t+1}\}$.
-
 
 \section{Experiments}
 For our experiments we chose to play the game Q*bert. We chose Q*bert because it
@@ -208,7 +203,6 @@ state might work better. Curiously, green's average reward per episode takes a
 dip after $900$ thousand iterations below all the other models. It is apparent
 that for smaller $L$, DRQN performs basically the same as a regular DQN but has a
 slightly more difficult time minimizing the loss. \\
-\\
 
 \begin{figure}[h]
     \centering
