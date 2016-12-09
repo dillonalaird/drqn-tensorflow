@@ -35,6 +35,7 @@
 \usepackage{graphicx}  % Required for including images
 
 \usepackage{booktabs} % Top and bottom rules for tables
+\usepackage{exscale}
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION 
@@ -138,6 +139,15 @@
 
 \end{block}
 
+\begin{block}{Attention Deep Recurrent Q-Learning}
+    \begin{itemize}
+        \item In \textbf{linear attention} we take the last $L$ hidden states and
+            compute the inner product with learned vector $v_a$ and take a softmax:
+            $$\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_t\} \text{, }
+              a_{t-i} = \text{softmax}(v_a^Th_{t-i})$$
+    \end{itemize}
+\end{block}
+
 %----------------------------------------------------------------------------------------
 
 \end{column} % End of column 2.1
@@ -146,13 +156,28 @@
 
 %----------------------------------------------------------------------------------------
 
-\begin{block}{Attention Deep Recurrent Q-Learning}
+%\begin{block}{Attention Deep Recurrent Q-Learning}
 \begin{itemize}
-        \item We have utilized linear attention.
-        \item We have utilized global attention.
+        \item We then take a weighted sum of the hidden states to get a context
+            vector $c_t$ that is used to calculate $Q$:
+            $$c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$$
+        \item In \textbf{global attention} we use the current hidden state, $h_t$,
+            to calculate the attention scores:
+            $$\{{h_{t-(L-1)}}^Th_t, \dots, {h_{t-1}}^Th_t\} \text{, }
+              a_{t-i} = \text{softmax}({h_{t-i}}^Th_t)$$
+        \item We then compute a context vector similar to above and pass it through
+            a final layer before it is used to compute $Q$:
+            $$c_t = \sum_{i=1}^{L-1}a_{t-i}h_{t-i} \text{, }
+              \tilde{h} = \tanh(W_a[h_t;c_t] + b_a)$$
 \end{itemize}
 
-\end{block}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=1.0]{DRQN_attn}
+    \caption{Architecture of the Attention DRQN}
+\end{figure}
+
+%\end{block}
 
 \end{column} % End of column 2.2
 
