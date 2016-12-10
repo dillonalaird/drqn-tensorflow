@@ -3,6 +3,7 @@
 
 \usepackage[scale=1.24]{beamerposter} % Use the beamerposter package for laying out the poster
 
+
 \usetheme{confposter} % Use the confposter theme supplied with this template
 
 \setbeamercolor{block title}{fg=ngreen,bg=white} % Colors of the block titles
@@ -36,6 +37,8 @@
 
 \usepackage{booktabs} % Top and bottom rules for tables
 \usepackage{exscale}
+\usepackage{caption}
+\captionsetup{labelformat=empty,labelsep=none}
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION 
@@ -71,7 +74,7 @@
 
 \begin{alertblock}{Abstract}
     Deep reinforcement learning models have proven to be successful at learning
-    control policies image inputs. They have, however, struggled with learning
+    control policies image inputs. However, they have struggled with learning
     policies that require longer term information. Recurrent neural network
     architectures have be used in tasks dealing with longer term dependencies
     between data points. We investigate these architectures to overcome the
@@ -86,12 +89,12 @@
               or greater performance on a wide variety of games (e.g. Atari 2600
               Games). 
         \item Deep Q-networks are limited in that they learn a mapping from a single
-              previous state which constist of a small number of game screens.
-        \item We explore the concept of a deep recurrent Q-network (DRQN), a
-              combination of a recurrent neural network (RNN) and a deep
-              Q-network (DQN) 
-        \item In addition to standard RNN architectures we also examine augmented RNN
-              architectures such as attention RNNs. 
+              previous state which consist of a small number of game screens.
+        \item We explore the concepts of deep recurrent Q-networks (DRQN),
+              and also a combination of recurrent neural network (RNN) and deep
+              Q-network (DQN).
+        \item In addition to standard RNN architectures, we also examine augmenting the RNN
+              architecture with an attention mechanism. 
     \end{itemize}
 \end{block}
 
@@ -102,11 +105,11 @@
         \centering
         \includegraphics[scale=0.5]{Qbert}
         \centering
-        \includegraphics[scale=0.5]{MsPacman}
+        \includegraphics[scale=0.5]{Seaquest}
         \centering
-        \includegraphics[scale=0.5]{MontezumaRevenge}
+        \includegraphics[scale=0.5]{MsPacman}
     \end{minipage}
-    \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
+    \caption{Q*bert, Seaquest, and Ms. Pac-Man}
 \end{figure}
 
 %----------------------------------------------------------------------------------------
@@ -130,8 +133,8 @@
     \item The architecture of DRQN augments DQN's fully connected layer with a LSTM.
     \item We accomplish this by looking at the last $L$ states:
         $$ \{s_{t-(L-1)}, \dots, s_{t}\} $$
-    \item We feed these into a convultion neural network (CNN) to get intermediate
-        outputs and finally send those through the RNN:
+    \item We feed these into a convolution neural network (CNN) to get intermediate
+        outputs and then send those through the RNN:
         $$\text{CNN}(s_{t-i}) = x_{t-i}$$
         $$\text{RNN}(x_{t-i}, h_{t-i-1}) = h_{t-i}$$
     \item The final output is used to predict the $Q$ value.
@@ -141,7 +144,7 @@
 
 \begin{block}{Attention Deep Recurrent Q-Learning}
     \begin{itemize}
-        \item In \textbf{linear attention} we take the last $L$ hidden states and
+        \item In \textbf{linear attention}, we take the last $L$ hidden states and
             compute the inner product with learned vector $v_a$ and take a softmax:
             $$\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_t\} \text{, }
               a_{t-i} = \text{softmax}(v_a^Th_{t-i})$$
@@ -158,10 +161,10 @@
 
 %\begin{block}{Attention Deep Recurrent Q-Learning}
 \begin{itemize}
-        \item We then take a weighted sum of the hidden states to get a context
+        \item Then, we take a weighted sum of hidden states to get a context
             vector $c_t$ that is used to calculate $Q$:
             $$c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$$
-        \item In \textbf{global attention} we use the current hidden state, $h_t$,
+        \item In \textbf{global attention}, we use the current hidden state, $h_t$,
             to calculate the attention scores:
             $$\{{h_{t-(L-1)}}^Th_t, \dots, {h_{t-1}}^Th_t\} \text{, }
               a_{t-i} = \text{softmax}({h_{t-i}}^Th_t)$$
