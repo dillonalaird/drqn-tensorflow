@@ -93,7 +93,7 @@
             \centering
             \includegraphics[scale=0.15]{MsPacman}
             \centering
-            \includegraphics[scale=0.15]{MontezumaRevenge}
+            \includegraphics[scale=0.15]{Seaquest}
         \end{minipage}
         \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
     \end{figure}
@@ -105,7 +105,37 @@
     important for predicting the action in the current state. We investigate
     augmenting DRQN with attention and evaluate its usefulness.
 
-\section{Background}
+\section{Deep Q-Learning}
+
+We examine agents playing Atari games. In our environment the agents interact with
+an Atari emulator. At time $t$ they recieve an observation $x_t \in \mathbb{R}^D$
+which is a vector of pixels from the current game screen. The agent then takes an
+action, $a_t \in \mathcal{A} = \{1, \dots, K\}$ and receives a reward $r_t$ which
+is the change in the game score. \\
+\\
+The objective of the agent is to take actions that maximize the future discounted
+rewards. We can calculate the future rewards with $R_t = \sum_{t' = 1}^T \gamma^{t'-1}r_{t'}$
+where $T$ is the end of the game and $\gamma$ is our discount factor. One way
+to achieve this objective is to find the optimal action-value function:
+$$Q^*(s,a) = \max_{\pi}\mathbb{E}[r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \dots
+|s_t = s, a_t = a, \pi]$$
+which is the expected value of the future discounted rewards under the policy
+$\pi = P(a|s)$, or the probability of taking an action given the agent is in a
+certain state. Unfortunately this method can be very difficult to calculate it
+so we approximate it with another function $Q(s,a;\theta) \approx Q^*(s,a)$. We
+examine several different types of deep neural network architectures for our
+function approximator which are called Q-networks. \\
+\\
+Training this function can be unstable and will sometimes diverge. The following
+following loss function is used to help reduce some of these issues [0]:
+\begin{equation}
+    L_i(\theta_i) = \mathbb{E}_{(s,a,r,s') \sim U(D)}\Big[\Big(
+    r + \gamma \max_{a'}Q(s',a';\theta_i^-) - Q(s,a;\theta_i)\Big)^2\Big]
+\end{equation}
+
+Where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1})$ and
+$D_t = \{e_1, \dots, e_t\}$. Experiences are drawn uniformly from our pool of
+stored experiences, $e_t \sim U(D)$.
 
 \section{Deep Recurrent Q-Learning}
 We propose three architectures for the Deep Recurrent Q-Network (DRQN). The first
@@ -119,7 +149,7 @@ predict the $Q$ value which is now a function of $Q(\{s_{t-(L-1)}, \dots, s_t\},
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.5]{DRQN_attn}
+    \includegraphics[scale=0.4]{DRQN_attn}
     \caption{Architecture of the Attention DRQN}
 \end{figure}
 
@@ -135,8 +165,9 @@ $c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$. This context vector is then used to pred
 the $Q$ value. \\
 \\
 The third architecture we used is global attention, similar to the global attention
-used in [3]. We treat the current state, $s_t$ as the "decoder" input and the
-previous $L - 2$ states as the "encoder" inputs. We compute the following scores,
+used in [3]. A diagram of this type of attention can be seen in Figure 2. We treat
+the current state, $s_t$ as the "decoder" input and the previous $L - 2$ states as
+the "encoder" inputs. We compute the following scores,
 $\{{h_{t-(L-1)}}^Th_t, \dots, {h_{t-1}}^Th_t\}$. We then take a softmax over these
 values, $a_{t-i} = \text{softmax}({h_{t-i}}^Th_t)$. The context vector is computed
 as a weighted sum over the previous hidden states, $c_t = \sum_{i=1}^{L-1}a_{t-i}h_{t-i}$.
@@ -146,19 +177,12 @@ to focus on previous states depending on the current state $h_t$ as opposed to a
 fixed vector such as $v_a$. \\
 \\
 Learning sequences of observations creates some difficulty when sampling
-experiences and using the following loss function [0]:
-$$L_i(\theta_i) = \mathbb{E}_{e_t \sim U(D)}
-\Big[\Big(
-r_t + \gamma \max_{a_t'}Q(s_{t+1}, a_t'; \theta_i^-) -Q(s_t, a_t; \theta_i)
-\Big)^2 \Big]$$
-where $e_t = (s_t, a_t, r_t, s_{t+1})$, $D_t = \{e_1, \dots, e_t\}$, $\gamma$
-is the discount factor and $e_t \sim U(D)$ are drawn uniformly at random from the
-pool of stored experiences. We propose a simple solution where we sample $e_t
-\sim U(D)$ and then take the previous $L$ states, $\{s_{t-(L+1)}, \dots, s_t\}$
-and zero out states from previous games. For example if $s_{t-i}$ was the end of
-the previous game then we would have states $\{\mathbf{0}, \dots, \mathbf{0},
-s_{t-(i+1)}, \dots, s_t\}$ and similarly for the next state $\{\mathbf{0}, \dots,
-\mathbf{0},s_{t-(i+2)}, \dots, s_{t+1}\}$.
+experiences and using the loss function defined in (1). We propose a simple
+solution where we sample $e_t \sim U(D)$ and then take the previous $L$ states,
+$\{s_{t-(L+1)}, \dots, s_t\}$ and zero out states from previous games. For example
+if $s_{t-i}$ was the end of the previous game then we would have states
+$\{\mathbf{0}, \dots, \mathbf{0}, s_{t-(i+1)}, \dots, s_t\}$ and similarly for the
+next state $\{\mathbf{0}, \dots, \mathbf{0},s_{t-(i+2)}, \dots, s_{t+1}\}$.
 
 \section{Experiments}
 For our experiments we chose to play the game Q*bert. We chose Q*bert because it
