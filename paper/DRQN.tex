@@ -185,10 +185,11 @@ $\{\mathbf{0}, \dots, \mathbf{0}, s_{t-(i+1)}, \dots, s_t\}$ and similarly for t
 next state $\{\mathbf{0}, \dots, \mathbf{0},s_{t-(i+2)}, \dots, s_{t+1}\}$.
 
 \section{Experiments}
-For our experiments we chose to play the game Q*bert. We chose Q*bert because it
-was a challenging game for DQN which achieved scores only slightly above human-level
-[0] but it was not so challenging that DQN could not make any progress, such as
-Montezuma's Revenge [0]. \\
+
+For our experiments we mainly focused on the game Q*bert. We chose Q*bert because
+it was a challenging game for DQN which achieved scores only slightly above
+human-level [0] but it was not so challenging that DQN could not make any progress,
+such as Montezuma's Revenge [0]. \\
 \\
 For input the DRQN takes a specified number of screens per state. The screen images
 are grayscaled and resized to $80 \times 80$. The first hidden layer convolves $16$,
@@ -197,66 +198,48 @@ linear unit.  The second hidden layer convolves $32$, $8 \times 8$ filters with
 stride $4$, again followed by a rectified linear unit.  Convolutional outputs are
 fed to an LSTM with $256$ hidden units per layer.  Finally, a fully connected
 linear layer outputs a Q-value for each possible action. \\
-\\
 
 \begin{figure}[h]
     \centering
     \begin{minipage}{1.0\textwidth}
         \centering
-        \includegraphics[scale=0.4]{avg_loss}
+        \includegraphics[scale=0.2]{avg_loss}
         \centering
-        \includegraphics[scale=0.4]{avg_q}
+        \includegraphics[scale=0.2]{avg_q}
         \centering
-        \includegraphics[scale=0.4]{episode_avg_reward}
+        \includegraphics[scale=0.2]{avg_reward}
     \end{minipage}
     \caption{Graphs for Q*bert Over Iterations}
 \end{figure}
 
-In Figure 3, the orange line is a regular DQN architecture with an CNN and $4$
-frames per state. The light blue line is a DRQN with $L=4$ and $1$ frame per state.
-The pink line is an DRQN with $L=4$ and $2$ frames per state. The blue line is a
-DRQN with $L=8$ and $1$ frames per state and the green line is a DRQN with $L=8$,
-$2$ frames per state and attention. \\
+For Figure 3 we trained $4$ different models for about $5$ million iterations on
+Q*bert which took about $6$ days to complete. All the models use the same
+convolutional neural network described above for processing the images. DQN uses
+$4$ game screens per state. All the DRQN models use $L=16$ and $2$ screens per
+state. DRQN is a basic recurrent model with no attention mechanism. DRQN-l is the
+recurrent model with linear attention and DRQN-g is the recurrent model with
+global attention. \\
 \\
-We can see from the graphs that blue seems to be performing the best in terms of
-average reward per episode. It also has the highest q value. Green, which is just
-blue with attention, performs slightly worse than blue but has a very difficult
-time minimizing loss. This tells us that our basic linear attention does not do
-much to help the model. A better attention mechanism conditioned on the most recent
-state might work better. Curiously, green's average reward per episode takes a
-dip after $900$ thousand iterations below all the other models. It is apparent
-that for smaller $L$, DRQN performs basically the same as a regular DQN but has a
-slightly more difficult time minimizing the loss. \\
+As you can see from Figure 3 the graphs for the DRQN models are very noisy. The
+regular DRQN performed the best in terms of average points per life but also had
+the most difficult time reducing the loss. DRQN-l had the noisiest graphs. It
+peformed close to the highest and lowest value at some point on every statistic.
+DRQN-g's performance was dissapointing. It had the easiest time minimizing the loss
+but struggled to gain momentum on average reward per life. \\
 
 \begin{figure}[h]
-    \centering
-    \begin{minipage}{1.0\textwidth}
-        \centering
-        \includegraphics[scale=0.4]{attention-avg_loss}
-        \centering
-        \includegraphics[scale=0.4]{attention-avg_q}
-        \centering
-        \includegraphics[scale=0.4]{attention-episode_avg_reward}
-    \end{minipage}
-    \caption{Graphs for Q*bert With 1-layer and 2-layer RNN and Attention}
+    \begin{center}
+        \begin{tabular}{| c | c |}
+            \hline
+            & \textbf{Best Score for Q*bert} \\ \hline
+            \textbf{DQN} & 700 \\ \hline 
+            \textbf{DRQN} & \textbf{850} \\ \hline
+            \textbf{DRQN-l} & 700 \\ \hline
+            \textbf{DRQN-g} & 550 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Best Scores for Q*bert}
 \end{figure}
-
-In Figure 4, an experiment has been run using the DRQN architecture with one and
-two layer RNN component. Both models are DRQN with $L = 8$, with $2$ frames per
-state and attention. The orange line represents the model with 1-layer RNN and
-the light blue line represents the model with 2-layer RNN. As can be seen, there
-is not much difference between the models, with the 2-layer RNN model performing
-slightly better on all the measures except the loss. However, note that the
-2-layer RNN has more difficulty minimizing loss than the 1-layer RNN after $1.8$
-million iterations. \\
-\\
-Both DRQN models have similar performance to the earlier models utilizing DQN with
-CNN and the DRQN at the start. However, they were run twice as long and have a
-dramatic increase in performance after 1 million iterations. This indicates that
-future experiments will need a lengthier training period before they can be
-properly evaluated or utilized. Unfortunately, we did not have enough time to
-experiment with a large number of parameters and run the models longer. This will
-be done in the second phase of the project.
 
 \section*{References}
 \small
