@@ -260,43 +260,26 @@ be done in the second phase of the project.
 
 \section*{Appendix A:}
 
-\begin{tabular}{ |l|l| }
+\begin{tabular}{ |l|l|l| }
   \hline
-  \multicolumn{2}{|c|}{List of hyperparameters and their values} \\
+  \multicolumn{3}{|c|}{List of Hyperparameters} \\
   \hline
-  minibatch size & 32\\
-  replay memory buffer size & 1000000\\
-  agent history length & 1-4\\
-  target network update frequency & 10000\\
-  discount factor & 0.99\\
-  action repeat & 4\\
-  update frequency & 4\\
-  initial exploration & 1\\
-  final exploration & 0.01\\
-  final exploration frame & 100000\\
-  no-op max & 30\\
-  learning rate of training & 0.00025\\
-  decay of RMSProp optimizer & 0.99\\
-  $\beta$ of RMSProp optimizer & 0.01\\
+  minibatch size & 32 & number of experiences for SGD update\\
+  replay memory buffer size & 1000000 & number of experiences in memory buffer\\
+  agent history length & 4-32 & number of most recent frames experienced input to the Q network\\
+  target network update frequency & 10000 & number of parameter updates after which the target network updates\\
+  discount factor & 0.99 & Discount factor $\gamma$ used in the Q-learning update\\
+  action repeat & 4 & Repeat each action selected by the agent this many times\\
+  update frequency & 4 & number of actions by agent between successive SGD updates. \\
+  initial exploration & 1 & Initial value of $\epsilon$ in $\epsilon$-greedy exploration \\
+  final exploration & 0.01 & Final value of $\epsilon$ in $\epsilon$-greedy exploration\\
+  final exploration frame & 100000 & The number of frames over which the initial value of $\epsilon$ reaches final value\\
+  no-op max & 30 & Maximum "do nothing" actions by agent at the start of episode.\\
+  learning rate of training & 0.00025 & learning rate used by RMSProp\\
+  decay of RMSProp optimizer & 0.99 & decay rate used by RMSProp\\
+  $\beta$ of RMSProp optimizer & 0.01 & $\beta$ rate of RMSProp\\
   \hline
 \end{tabular}\\
-
-Now we describe each of the entries in the parameter table above:
-\begin{itemize}
-   \item minibatch size: number of training experience tuples over which each (SGD) update is calculated
-   \item replay memory buffer size: number of experience tuples capable of being stored in the memory buffer from which experience tuples are sampled for SGD updates
-   \item agent history length: number of most recent frames experienced by the agent that are given as input to the Q network
-   \item target network update frequency: the frequency (measured in the number of parameter updates) with which the target network is updated
-   \item discount factor: Discount factor $\gamma$ used in the Q-learning update
-   \item action repeat: Repeat each action selected by the agent this many times.  Since we used a value of 4, the agent sees only every 4th input frame.
-   \item update frequency: The number of actions selected by the agent between successive SGD updates.  Using a value of 4 results in the agent selecting 4 actions between each pair of successive updates.  
-   \item initial exploration: Initial value of $\epsilon$ in $\epsilon$-greedy exploration 
-   \item final exploration: Final value of $\epsilon$ in $\epsilon$-greedy exploration
-   \item final exploration frame: The number of frames over which the initial value of $\epsilon$ is linearly annealed to its final value
-   \item no-op max: Maximum number of "do nothing" actions to be performed by the agent at the start of an episode.
-   \item learning rate of training: learning rate used by RMSProp
-   \item decay of RMSProp optimizer: decay rate used by RMSProp
-\end{itemize}
 
 \section*{References}
 \small
