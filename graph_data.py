@@ -23,15 +23,23 @@ def grab_data(directory, tag):
     return data
 
 
-def graph_data_mul(datas, n=20):
+def graph_data_mul(datas, labels, title, xlabel, ylabel, n=20):
+    lines = []
     for i,data in enumerate(datas):
         x = [ii for ii in xrange(len(data))]
         y = [xi[1] for xi in data]
         window = np.ones((n,))/n
         smooth = np.convolve(y, window, mode="valid")
         diff = int((len(y) - len(smooth))/2)
-        plt.plot(x, y, alpha=0.4, linewidth=2.0, color=plt.rcParams["axes.color_cycle"][i])
+        plt.plot(x, y, alpha=0.4, linewidth=2.0,
+                 color=plt.rcParams["axes.color_cycle"][i])
         smooth_x = [ii for ii in xrange(diff, len(smooth) + diff)]
-        plt.plot(smooth_x, smooth, linewidth=2.0, color=plt.rcParams["axes.color_cycle"][i])
+        line, = plt.plot(smooth_x, smooth, linewidth=2.0, label=labels[i],
+                         color=plt.rcParams["axes.color_cycle"][i])
+        lines.append(line)
 
+    plt.legend(handles=lines, loc=1)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
     plt.show()
