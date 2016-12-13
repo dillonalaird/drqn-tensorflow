@@ -193,46 +193,40 @@
 \begin{column}{\twocolwid}
 
 \begin{block}{Experiments}
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{1.0\textwidth}
+        \centering
+        \includegraphics[scale=0.7]{avg_loss}
+        \centering
+        \includegraphics[scale=0.7]{avg_q}
+        \centering
+        \includegraphics[scale=0.7]{avg_reward}
+    \end{minipage}
+    \caption{Graphs for Q*bert Over Iterations}
+\end{figure}
 \end{block}
-
 \end{column}
 
 \begin{columns}[t,totalwidth=\twocolwid] % Split up the two columns wide column again
 
 \begin{column}{\onecolwid} % The first column within column 2 (column 2.1)
 
-\begin{figure}[h]
-    \centering
-    \begin{minipage}{1.0\textwidth}
-        \centering
-        \includegraphics[scale=0.45]{avg_loss}
-        \centering
-        \includegraphics[scale=0.45]{avg_q}
-        \centering
-        \includegraphics[scale=0.45]{avg_reward}
-    \end{minipage}
-    \caption{Graphs for Q*bert Over Iterations}
-\end{figure}
-
 %----------------------------------------------------------------------------------------
+\begin{itemize}
+    \item Images are grayscaled and resized to $80 \times 80$
+    \item CNN is $2$ layers, first is $16$, $19 \times 19$ filters with stride
+        $8$, second is $32$, $8 \times 8$ filters with stride of $4$.
+\end{itemize}
 
 \end{column} % End of column 2.1
 
 
 \begin{column}{\onecolwid} % The second column within column 2 (column 2.2)
-
-\begin{figure}[h]
-    \centering
-    \begin{minipage}{1.0\textwidth}
-        \centering
-        \includegraphics[scale=0.45]{Seaquest-DQN_vs_DRQN1.png}
-        \centering
-        \includegraphics[scale=0.45]{Seaquest-DQN_vs_DRQN2.png}
-        \centering
-        \includegraphics[scale=0.45]{Seaquest-DQN_vs_DRQN3.png}
-    \end{minipage}
-    \caption{Graphs for Seaquest Over Iterations}
-\end{figure}
+\begin{itemize}
+    \item DRQN uses $L=16$ and $2$ screens per state.
+    \item DRQN takes up to $6$ days to complete $5$ million iterations.
+\end{itemize}
 
 %----------------------------------------------------------------------------------------
 
@@ -258,7 +252,7 @@
 
 % SCORE TABLE
 \begin{gather*}
-	Q^{\ast}bert Scores
+	Q^{\ast}bert \text{ } Scores
 \end{gather*}
 
 \begin{table}
@@ -276,6 +270,11 @@
     \end{tabular}
 \end{table}
 
+\begin{itemize}
+    \item DRQN boosts score by $20\%$ while global attention hinders score by
+        $20\%$.
+\end{itemize}
+
 \end{block}
 
 %----------------------------------------------------------------------------------------
@@ -284,10 +283,29 @@
 
 \begin{block}{Discussion}
 
-    \begin{itemize}
-        \item Conclusions
-        \item Future work
-    \end{itemize}
+\begin{center}
+\textbf{Conclusion}
+\end{center}
+\begin{itemize}
+    \item DRQN clearly adds benefits for training on more difficult games although
+        it takes much longer to train.
+    \item Attention makes it much more difficult to train by adding extra complexity
+        to the architecture and more parameters.
+    \item Attention is not necessary for playing games such as Q*bert where the full
+        game state is visible on the screen. It may be more benificial for games
+        where game states are only partially observed.
+\end{itemize}
+\begin{center}
+\textbf{Future Work}
+\end{center}
+\begin{itemize}
+    \item Testing DRQN and DRQN with attention on games such as Battlezone
+        where game state is partially observed.
+    \item Trying different augmented recurrent neural networks such as memory
+        networks for handling even longer term dependencies in games.
+    \item Training the algorithms for longer. It is clear the algorithms did not
+        converge and if we had more time we would run them for longer.
+\end{itemize}
 
 \end{block}
 
