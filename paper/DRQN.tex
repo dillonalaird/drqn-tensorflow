@@ -156,8 +156,9 @@ that happened several dozens screen backs. We also examine using an attention
 mechanism in the RNN. Attention allows the RNN to focus on particular states it
 has seen in the past. One can think of it as assigning importance to the states
 iterated over by the RNN. We investigate $2$ forms of attention; A linear attention
-that assigns a fixed importance over the previous states and a global attention
-whose importance assigned to previous states is depenedent on the current state. \\
+that uses a learned vector to assign importances over the previous states and a
+global attention that assigns importances to previous states based on the current
+state. \\
 \\
 The first architecture is a very basic extension of DQN. The architecture of DRQN
 augments DQN's fully connected layer with a LSTM. We accomplish this by looking at
@@ -214,7 +215,7 @@ such as Montezuma's Revenge [0]. \\
 \\
 For input the DRQN takes a specified number of screens per state. The screen images
 are grayscaled and resized to $80 \times 80$. The first hidden layer convolves $16$,
-$19 \times 19$ filters with stride 8 across the input image and applies a rectified
+$19 \times 19$ filters with stride $8$ across the input image and applies a rectified
 linear unit.  The second hidden layer convolves $32$, $8 \times 8$ filters with
 stride $4$, again followed by a rectified linear unit.  Convolutional outputs are
 fed to an LSTM with $256$ hidden units per layer.  Finally, a fully connected
