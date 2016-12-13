@@ -65,6 +65,7 @@
   difficulties arising from learning policies with long term dependencies.
 \end{abstract}
 
+
 \section{Introduction}
     Recent advances in reinforcement Learning have led to human-level or greater
     performance on a wide variety of games (e.g. Atari 2600 Games). However,
@@ -77,10 +78,11 @@
     DQN is trained using an input consisting of the last four game screens. Thus,
     DQN performs poorly at games that require the agent to remember information
     more than four screens ago. This is evident from the types of games DQN performs
-    poorly at, near or below human-level, in Figure 1. \\
+    poorly at, near or below human-level [0], in Figure 1. \\
     \\
     We explore the concept of a deep recurrent Q-network (DRQN), a combination of
-    a recurrent neural network (RNN) [6] and a deep Q-network (DQN) similar to [5].
+    a recurrent neural network (RNN) [6] and a deep Q-network (DQN) similar to [5]
+    \footnote{code at \url{https://github.com/dillonalaird/deep-rl-tensorflow}}.
     The idea being that the RNN will be able to retain information from states
     further back in time and incorporate that into predicting better Q values
     and thus performing better on games that require long term planning. \\
@@ -98,6 +100,7 @@
         \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
     \end{figure}
 
+
     In addition to vanilla RNN architectures we also examine augmented RNN
     architectures such as attention RNNs. Recent achievments of attention RNNs in
     translation tasks [2, 3] have shown promise. The advantage of using attention
@@ -112,7 +115,18 @@ flying RC helicopters [8]. Traditionally reinforcement learning relied upon
 iterative algorithms to train agents on smaller state spaces. Later, algorithms
 such as Q-learning were used with non-linear function aproximators to train agents
 on larger state spaces. These algorithms, however, were more difficult to train
-and could diverge [9].
+and would diverge [9].
+
+Recent advances in reinforcement learning have made it possible to use deep
+neural networks as non-linear function approximators and train them without
+running into stability issues. These types of models are known as Q-networks and
+have been shown to be very successful at playing games such as Atari games where
+the input is nothing more than the pixels on the screen [0, 1].
+
+We examine extending this framework to include RNNs. RNNs have been used before
+in Q-Learning [5] but on partially observable Markov decision processes created
+by flickering the game screen. Our goal is to improve the average score the agent
+receives.
 
 \section{Deep Q-Learning}
 
@@ -145,7 +159,9 @@ following loss function is used to help reduce some of these issues [0]:
 
 Where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1})$ and
 $D_t = \{e_1, \dots, e_t\}$. Experiences are drawn uniformly from our pool of
-stored experiences, $e_t \sim U(D)$.
+stored experiences, $e_t \sim U(D)$. $\theta_i^-$ are the parameters used to compute
+the target. These parameters are only updated every $C$ iterations and help
+stabilize training.
 
 \section{Deep Recurrent Q-Learning}
 
@@ -279,10 +295,24 @@ screen it does not need to focus on game screens too far back.
 
 \section*{Conclusion}
 
-\section*{Acknowledgement}
+We investigate using an RNN on top of a DQN (DRQN) and test several different types
+of attention to augment the RNN. We show that a basic DRQN is capable of achieving
+better scores than a DQN on a game that is difficult for DQN to play. We also
+show that adding attention can hinder the performance on certain games as well. \\
+\\
+Going forward we would have liked to train the algorithms for even longer to see
+if attention eventually does perform better. It is apparent that the graphs have
+not converged and are still very noisy. We also think running the agent on games
+like Battlezone would have had a better time utilizing the attention mechanism to
+achieve higher scores. In Battlezone the entire game state is not revieled in a
+single screen so it is much more important to be able to refer back to previous
+screens for information.
+
+\section*{Acknowledgements}
 
 We would like to thank carpedm20 for using his DQN repository as a base for
-running our experiments. 
+running our experiments. It saved us a lot of time and allowed us to focus on the
+core part of our experiment which was testing DRQN.
 
 \section*{References}
 \small
@@ -303,8 +333,32 @@ running our experiments.
 
 [7] Gerald Tesauro. Temporal difference learning and td-gammon. {\it Communications of the ACM}, 38(3):58-68, 1995.
 
-[8] Andrew Y. Ng, H. Jin Kim, Michael I. Jordan and Shankar Sastry. Autonomous helicopter flight via reinforcement learning. {\it Neural Information Processing Systems}, 2003.
+[8] Andrew Y. Ng, H. Jin Kim, Michael I. Jordan and Shankar Sastry. Autonomous Helicopter Flight via Reinforcement Learning. {\it Advances in Neural Information Processing Systems 16}, 2003.
 
 [9] John N. Tsitsiklis and Benjamin Van Roy. An analysis of temporal-difference learning with function approximation. {\it Automatic Control, IEEE Transactions on}, 42(5):647-690, 1997.
+
+
+\section*{Appendix A:}
+
+\begin{tabular}{ |l|l|l| }
+  \hline
+  \multicolumn{3}{|c|}{List of Hyperparameters} \\
+  \hline
+  minibatch size & 32 & number of experiences for SGD update\\
+  replay memory buffer size & 1000000 & number of experiences in memory buffer\\
+  agent history length & 4-32 & number of most recent frames experienced input to the Q network\\
+  target network update frequency & 10000 & number of parameter updates after which the target network updates\\
+  discount factor & 0.99 & Discount factor $\gamma$ used in the Q-learning update\\
+  action repeat & 4 & Repeat each action selected by the agent this many times\\
+  update frequency & 4 & number of actions by agent between successive SGD updates. \\
+  initial exploration & 1 & Initial value of $\epsilon$ in $\epsilon$-greedy exploration \\
+  final exploration & 0.01 & Final value of $\epsilon$ in $\epsilon$-greedy exploration\\
+  final exploration frame & 100000 & The number of frames over which the initial value of $\epsilon$ reaches final value\\
+  no-op max & 30 & Maximum "do nothing" actions by agent at the start of episode.\\
+  learning rate of training & 0.00025 & learning rate used by RMSProp\\
+  decay of RMSProp optimizer & 0.99 & decay rate used by RMSProp\\
+  $\beta$ of RMSProp optimizer & 0.01 & $\beta$ rate of RMSProp\\
+  \hline
+\end{tabular}
 
 \end{document}
