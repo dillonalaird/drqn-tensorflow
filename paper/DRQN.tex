@@ -105,6 +105,11 @@
     important for predicting the action in the current state. We investigate
     augmenting DRQN with attention and evaluate its usefulness.
 
+\section{Relatd Work}
+
+Reinforcement learning covers a variety of areas from playing backgommon [7] to
+flying RC helicopters [8]. More recently 
+
 \section{Deep Q-Learning}
 
 We examine agents playing Atari games. In our environment the agents interact with
@@ -116,7 +121,8 @@ is the change in the game score. \\
 The objective of the agent is to take actions that maximize the future discounted
 rewards. We can calculate the future rewards with $R_t = \sum_{t' = 1}^T \gamma^{t'-1}r_{t'}$
 where $T$ is the end of the game and $\gamma$ is our discount factor. One way
-to achieve this objective is to find the optimal action-value function:
+to achieve this objective is by taking the action corresponding to the maximum
+action-value function:
 $$Q^*(s,a) = \max_{\pi}\mathbb{E}[r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \dots
 |s_t = s, a_t = a, \pi]$$
 which is the expected value of the future discounted rewards under the policy
@@ -138,14 +144,25 @@ $D_t = \{e_1, \dots, e_t\}$. Experiences are drawn uniformly from our pool of
 stored experiences, $e_t \sim U(D)$.
 
 \section{Deep Recurrent Q-Learning}
-We propose three architectures for the Deep Recurrent Q-Network (DRQN). The first
-is a very basic extension of DQN. The architecture of DRQN augments DQN's fully
-connected layer with a LSTM. We accomplish this by looking at the last $L$ states,
-$\{s_{t-(L-1)}, \dots, s_{t}\}$ and feed these into a convolutional neural network
-(CNN) to get intermediate outputs $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then
-fed into a RNN (we use an LSTM for this but it can be any RNN),
-$\text{RNN}(x_{t-i}, h_{t-i-1}) = h_{t-i}$, and the final output $h_t$ is used to
-predict the $Q$ value which is now a function of $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
+
+We examine several architectures for the DRQN. The idea behind using a RNN on top
+of a DQN is to retain information for longer periods of time. This should help the
+agent accomplish tasks that may require the agent to remember a particular event
+that happened several dozens screen backs. We also examine using an attention
+mechanism in the RNN. Attention allows the RNN to focus on particular states it
+has seen in the past. One can think of it as assigning importance to the states
+iterated over by the RNN. We investigate $2$ forms of attention; A linear attention
+that assigns a fixed importance over the previous states and a global attention
+whose importance assigned to previous states is depenedent on the current state. \\
+\\
+The first architecture is a very basic extension of DQN. The architecture of DRQN
+augments DQN's fully connected layer with a LSTM. We accomplish this by looking at
+the last $L$ states, $\{s_{t-(L-1)}, \dots, s_{t}\}$ and feed these into a
+convolutional neural network (CNN) to get intermediate outputs
+$\text{CNN}(s_{t-i}) = x_{t-i}$. These are then fed into a RNN (we use an LSTM for
+this but it can be any RNN), $\text{RNN}(x_{t-i}, h_{t-i-1}) = h_{t-i}$, and the
+final output $h_t$ is used to predict the $Q$ value which is now a function of
+$Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
 
 \begin{figure}[h]
     \centering
@@ -153,13 +170,13 @@ predict the $Q$ value which is now a function of $Q(\{s_{t-(L-1)}, \dots, s_t\},
     \caption{Architecture of the Attention DRQN}
 \end{figure}
 
-The second architecture we used was a version of an attention RNN, depicted in
-Figure 2, we are calling linear attention. For the linear attention RNN we take
-the $L$ hidden states outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$ and
-calculate an inner product with $v_a$, $\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_{t}\}$.
-This allows the model to focus more on nearby hidden states or further away states
-depending on what values of $v_a$ are learned. We then take a softmax over these
-values, $a_{t-i} = \text{softmax}(v_a^Th_{t-i})$. We use this softmax to take a weighted
+The second architecture we used was a version of an attention RNN we are calling 
+linear attention. For the linear attention RNN we take the $L$ hidden states
+outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$ and calculate an inner
+product with $v_a$, $\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_{t}\}$. This allows the
+model to focus more on nearby hidden states or further away states depending on
+what values of $v_a$ are learned. We then take a softmax over these values,
+$a_{t-i} = \text{softmax}(v_a^Th_{t-i})$. We use this softmax to take a weighted
 sum over the hidden states to get a context vector,
 $c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$. This context vector is then used to predict
 the $Q$ value. \\
@@ -217,17 +234,15 @@ Q*bert which took about $6$ days to complete. All the models use the same
 convolutional neural network described above for processing the images. DQN uses
 $4$ game screens per state. All the DRQN models use $L=16$ and $2$ screens per
 state. DRQN is a basic recurrent model with no attention mechanism. DRQN-l is the
-recurrent model with linear attention. DRQN-g is the recurrent model with
-global attention and DRQN2-g is the same as DRQN-g except with a $2$ layer LSTM.\\
+recurrent model with linear attention and DRQN-g is the recurrent model with
+global attention. \\
 \\
 As you can see from Figure 3 the graphs for the DRQN models are very noisy. The
 regular DRQN performed the best in terms of average points per life but also had
 the most difficult time reducing the loss. DRQN-l had the noisiest graphs. It
 peformed close to the highest and lowest value at some point on every statistic.
 DRQN-g's performance was dissapointing. It had the easiest time minimizing the loss
-but struggled to gain momentum on average reward per life. Interestingly, when we
-added another layer, while it had a harder time minimizing the loss, the average
-score was much more consistent and seemed to converge.\\
+but struggled to gain momentum on average reward per life. \\
 
 \begin{figure}[h]
     \begin{center}
@@ -242,6 +257,8 @@ score was much more consistent and seemed to converge.\\
     \end{center}
     \caption{Best Scores for Q*bert}
 \end{figure}
+
+\section*{Conclusion}
 
 \section*{References}
 \small
@@ -259,5 +276,9 @@ score was much more consistent and seemed to converge.\\
 [5] Matthew Hausknecht and Peter Stone. Deep Recurrent Q-Learning for Partially Observable MDPs. {\it arXiv preprint arXiv:1507.06527}, 2015.
 
 [6] Sepp Hochreiter and Jurgen Schmidhuber. Long Short-Term Memory. {\it Neural Computation}, 9(8):1735-1780, 1997.
+
+[7] Gerald Tesauro. Temporal difference learning and td-gammon. {\it Communications of the ACM}, 38(3):58-68, 1995.
+
+[8] Andrew Y. Ng, H. Jin Kim, Michael I. Jordan and Shankar Sastry. {\it Neural Information Processing Systems}, 2003.
 
 \end{document}

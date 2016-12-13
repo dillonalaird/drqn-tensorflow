@@ -201,21 +201,38 @@
 
 \begin{column}{\onecolwid} % The first column within column 2 (column 2.1)
 
-\begin{itemize}
-    \item Basic DQN
-    \item Basic RDQN
-\end{itemize}
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{1.0\textwidth}
+        \centering
+        \includegraphics[scale=0.45]{avg_loss}
+        \centering
+        \includegraphics[scale=0.45]{avg_q}
+        \centering
+        \includegraphics[scale=0.45]{avg_reward}
+    \end{minipage}
+    \caption{Graphs for Q*bert Over Iterations}
+\end{figure}
 
 %----------------------------------------------------------------------------------------
 
 \end{column} % End of column 2.1
 
+
 \begin{column}{\onecolwid} % The second column within column 2 (column 2.2)
 
-\begin{itemize}
-    \item RDQN with linear attention.
-    \item RDQN with global attention.
-\end{itemize}
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{1.0\textwidth}
+        \centering
+        \includegraphics[scale=0.45]{Seaquest-DQN_vs_DRQN1.png}
+        \centering
+        \includegraphics[scale=0.45]{Seaquest-DQN_vs_DRQN2.png}
+        \centering
+        \includegraphics[scale=0.45]{Seaquest-DQN_vs_DRQN3.png}
+    \end{minipage}
+    \caption{Graphs for Seaquest Over Iterations}
+\end{figure}
 
 %----------------------------------------------------------------------------------------
 
@@ -223,9 +240,9 @@
 
 \end{columns} % End of the split of column 2
 
-\begin{alertblock}{Box}
-    Text or image?
-\end{alertblock} 
+%\begin{alertblock}{Box}
+%    Text or image?
+%\end{alertblock} 
 
 \end{column} % End of the second column
 
@@ -250,15 +267,11 @@
         \toprule
             \textbf{Algorithms} & \textbf{Scores} \\
         \midrule
-            Random & 157 \\
-            Sarsa & 614 \\
-            Contingency & 960 \\
-            DQN & \textbf{1952} \\
-            Human & 18900 \\
-        \midrule
-            HNeat Best & 1800 \\
-            HNeat Pixel & 1325 \\
-            DQN Best & \textbf{4500} \\
+            Random & 150 \\
+            DQN & 700 \\
+            DRQN & \textbf{850} \\
+            DRQN-l & 700 \\
+            DRQN-g & 550 \\
         \bottomrule
     \end{tabular}
 \end{table}
