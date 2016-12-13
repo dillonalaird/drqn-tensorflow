@@ -31,7 +31,7 @@ def graph_data_mul(datas, labels, title, xlabel, ylabel, n=20):
         window = np.ones((n,))/n
         smooth = np.convolve(y, window, mode="valid")
         diff = int((len(y) - len(smooth))/2)
-        plt.plot(x, y, alpha=0.4, linewidth=2.0,
+        plt.plot(x, y, alpha=0.2, linewidth=2.0,
                  color=plt.rcParams["axes.color_cycle"][i])
         smooth_x = [ii for ii in xrange(diff, len(smooth) + diff)]
         line, = plt.plot(smooth_x, smooth, linewidth=2.0, label=labels[i],
