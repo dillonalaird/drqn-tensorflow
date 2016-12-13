@@ -217,15 +217,17 @@ Q*bert which took about $6$ days to complete. All the models use the same
 convolutional neural network described above for processing the images. DQN uses
 $4$ game screens per state. All the DRQN models use $L=16$ and $2$ screens per
 state. DRQN is a basic recurrent model with no attention mechanism. DRQN-l is the
-recurrent model with linear attention and DRQN-g is the recurrent model with
-global attention. \\
+recurrent model with linear attention. DRQN-g is the recurrent model with
+global attention and DRQN2-g is the same as DRQN-g except with a $2$ layer LSTM.\\
 \\
 As you can see from Figure 3 the graphs for the DRQN models are very noisy. The
 regular DRQN performed the best in terms of average points per life but also had
 the most difficult time reducing the loss. DRQN-l had the noisiest graphs. It
 peformed close to the highest and lowest value at some point on every statistic.
 DRQN-g's performance was dissapointing. It had the easiest time minimizing the loss
-but struggled to gain momentum on average reward per life. \\
+but struggled to gain momentum on average reward per life. Interestingly, when we
+added another layer, while it had a harder time minimizing the loss, the average
+score was much more consistent and seemed to converge.\\
 
 \begin{figure}[h]
     \begin{center}
