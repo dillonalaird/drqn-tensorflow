@@ -93,11 +93,13 @@
             \centering
             \includegraphics[scale=0.15]{Qbert}
             \centering
-            \includegraphics[scale=0.15]{MsPacman}
-            \centering
             \includegraphics[scale=0.15]{Seaquest}
+            \centering
+            \includegraphics[scale=0.15]{SpaceInvaders}
+            \centering
+            \includegraphics[scale=0.15]{BattleZone}
         \end{minipage}
-        \caption{Q*bert, Ms. Pac-Man and Montezuma's Revenge}
+        \caption{Q*bert, Seaquest, SpaceInvaders, and BattleZone}
     \end{figure}
 
 
@@ -293,16 +295,16 @@ but struggled to gain momentum on average reward per life. \\
 
 \begin{figure}[h]
     \begin{center}
-        \begin{tabular}{| c | c |}
+        \begin{tabular}{| c | c | c | c | c |}
             \hline
-            & \textbf{Best Score for Q*bert} \\ \hline
-            \textbf{DQN} & 700 \\ \hline 
-            \textbf{DRQN} & \textbf{850} \\ \hline
-            \textbf{DRQN-l} & 700 \\ \hline
-            \textbf{DRQN-g} & 550 \\ \hline
+            & \textbf{Q*bert} & \textbf{Seaquest} & \textbf{SpaceInvaders} & \textbf{BattleZone} \\ \hline
+            \textbf{DQN} & 700 & 360 &  & \\ \hline 
+            \textbf{DRQN} & \textbf{850} & 160 & 755 & \\ \hline
+            \textbf{DRQN-l} & 700 & \textbf{620} & \textbf{765} & \\ \hline
+            \textbf{DRQN-g} & 550 & 380 & 410 & \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Best Scores for Q*bert}
+    \caption{Best Scores for Trained Atari Games}
 \end{figure}
 
 In Figure 4 we can see the best scores received from each of the algorithms playing
