@@ -84,7 +84,7 @@
     a recurrent neural network (RNN) [6] and a deep Q-network (DQN) similar to [5]
     \footnote{code at \url{https://github.com/dillonalaird/deep-rl-tensorflow}}.
     The idea being that the RNN will be able to retain information from states
-    further back in time and incorporate that into predicting better Q values
+    further back in time and incorporate that into predicting better $Q$ values
     and thus performing better on games that require long term planning. \\
 
     \begin{figure}[h]
@@ -95,9 +95,7 @@
             \centering
             \includegraphics[scale=0.15]{Seaquest}
             \centering
-            \includegraphics[scale=0.15]{SpaceInvaders}
-            \centering
-            \includegraphics[scale=0.15]{BattleZone}
+            \includegraphics[scale=0.15]{MontezumaRevenge}
         \end{minipage}
         \caption{Q*bert, Seaquest, SpaceInvaders, and BattleZone}
     \end{figure}
@@ -166,8 +164,8 @@ drawn uniformly at random from the memory buffer. This is called experience repl
 and is designed to mitigate instability in the training process. In the loss
 function above, $\theta_i^-$ are the network parameters used to compute the target
 network at iteration $i$. We only update these target network parameters with
-the $Q$-network parameters $\theta_i$ every $C$ steps; note that we are keeping a
-$Q$-network and a target network.
+the Q-network parameters $\theta_i$ every $C$ steps; note that we are keeping a
+Q-network and a target network.
 
 \section{Deep Recurrent Q-Learning}
 
@@ -290,6 +288,12 @@ the most difficult time reducing the loss. DRQN-l had the noisiest graphs. It
 peformed close to the highest and lowest value at some point on every statistic.
 DRQN-g's performance was dissapointing. It had the easiest time minimizing the loss
 but struggled to gain momentum on average reward per life. \\
+\\
+In Figure 4 we trained all $4$ models on Seaquest. For our DRQN models we used
+$L=2$ with $2$ game screens so they were looking over the same number of game
+screens as DQN, $4$. The average scores all converge to the same value which is
+what we would expect since each agent is given the same number of screens to
+predict the $Q$ value with.
 
 \begin{figure}[h]
     \begin{center}
@@ -305,7 +309,7 @@ but struggled to gain momentum on average reward per life. \\
     \caption{Best Scores for Trained Atari Games}
 \end{figure}
 
-In Figure 4 we can see the best scores received from each of the algorithms playing
+In Figure 5 we can see the best scores received from each of the algorithms playing
 $100$ games of Q*bert. This table reflects where the algorithms ended up in the
 average rewards per life graph in Figure 3 with DRQN peforming the best followed
 by DQN, DRQN-l and finally DRQN-g. Unfortunately we were not able to reproduce the
