@@ -159,11 +159,15 @@ following loss function is used to help reduce some of these issues [0]:
     r + \gamma \max_{a'}Q(s',a';\theta_i^-) - Q(s,a;\theta_i)\Big)^2\Big]
 \end{equation}
 
-Where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1})$ and
-$D_t = \{e_1, \dots, e_t\}$. Experiences are drawn uniformly from our pool of
-stored experiences, $e_t \sim U(D)$. $\theta_i^-$ are the parameters used to compute
-the target. These parameters are only updated every $C$ iterations and help
-stabilize training.
+Where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1}($ and the buffer
+in which experiences are stored is $D_t = \{e_1, \dots, e_t\}$. In the SGD update
+we sample minibatches of experience tuples $(s, a, r, s') \sim U(D)$ which are
+drawn uniformly at random from the memory buffer. This is called experience replay
+and is designed to mitigate instability in the training process. In the loss
+function above, $\theta_i^-$ are the network parameters used to compute the target
+network at iteration $i$. We only update these target network parameters with
+the $Q$-network parameters $\theta_i$ every $C$ steps; note that we are keeping a
+$Q$-network and a target network.
 
 \section{Deep Recurrent Q-Learning}
 
@@ -189,7 +193,7 @@ $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.4]{DRQN_attn}
+    \includegraphics[scale=0.3]{DRQN_attn}
     \caption{Architecture of the Attention DRQN}
 \end{figure}
 
@@ -237,7 +241,8 @@ $19 \times 19$ filters with stride $8$ across the input image and applies a rect
 linear unit.  The second hidden layer convolves $32$, $8 \times 8$ filters with
 stride $4$, again followed by a rectified linear unit.  Convolutional outputs are
 fed to an LSTM with $256$ hidden units per layer.  Finally, a fully connected
-linear layer outputs a Q-value for each possible action. \\
+linear layer outputs a Q-value for each possible action. All of the hyperparameters
+used are listed in Apendix A. These are similar to the hyperparameters used in [0]. \\
 
 \begin{figure}[h]
     \centering
@@ -281,10 +286,16 @@ linear layer outputs a Q-value for each possible action. \\
 For Figure 3 we trained $4$ different models for about $5$ million iterations on
 Q*bert which took about $6$ days to complete. All the models use the same
 convolutional neural network described above for processing the images. DQN uses
-$4$ game screens per state. All the DRQN models use $L=16$ and $2$ screens per
-state. DRQN is a basic recurrent model with no attention mechanism. DRQN-l is the
-recurrent model with linear attention and DRQN-g is the recurrent model with
-global attention. \\
+$4$ game screens per state. \\
+\\
+The DRQN models in Figure 3 used $L=16$ and $2$ screens per state which allows it
+to see the last $32$ frames. We wanted to give the model let the model look over
+enough previous states to more informed decision but not so many that RNN suffers
+from vanishing or exploding gradients and training time issues which is why we
+chose $L=16$. We found $2$ screens per states to allow the model to run efficiently
+without suffering in scores. DRQN is a basic recurrent model with no attention
+mechanism. DRQN-l is the recurrent model with linear attention and DRQN-g is the
+recurrent model with global attention. \\
 \\
 As you can see from Figure 3 the graphs for the DRQN models are very noisy. The
 regular DRQN performed the best in terms of average points per life but also had
@@ -310,7 +321,8 @@ but struggled to gain momentum on average reward per life. \\
 In Figure 4 we can see the best scores received from each of the algorithms playing
 $100$ games of Q*bert. This table reflects where the algorithms ended up in the
 average rewards per life graph in Figure 3 with DRQN peforming the best followed
-by DQN, DRQN-l and finally DRQN-g. \\
+by DQN, DRQN-l and finally DRQN-g. Unfortunately we were not able to reproduce the
+score achieved by [1] on Q*bert. \\
 \\
 From these figures it is evident that while adding a recurrent layer helped the
 agent, adding an attention mechanism only hidnered the agent. We hypothesize
@@ -342,6 +354,29 @@ We would like to thank carpedm20 for using his DQN repository as a base for
 running our experiments. It saved us a lot of time and allowed us to focus on the
 core part of our experiment which was testing DRQN.
 
+\section*{Appendix A:}
+
+\begin{tabular}{ |l|l|l| }
+  \hline
+  \multicolumn{3}{|c|}{List of Hyperparameters} \\
+  \hline
+  minibatch size & 32 & number of experiences for SGD update\\
+  replay memory buffer size & 1000000 & number of experiences in memory buffer\\
+  agent history length & 4-32 & number of most recent frames experienced input to the Q network\\
+  target network update frequency & 10000 & number of parameter updates after which the target network updates\\
+  discount factor & 0.99 & Discount factor $\gamma$ used in the Q-learning update\\
+  action repeat & 4 & Repeat each action selected by the agent this many times\\
+  update frequency & 4 & number of actions by agent between successive SGD updates. \\
+  initial exploration & 1 & Initial value of $\epsilon$ in $\epsilon$-greedy exploration \\
+  final exploration & 0.01 & Final value of $\epsilon$ in $\epsilon$-greedy exploration\\
+  final exploration frame & 100000 & The number of frames over which the initial value of $\epsilon$ reaches final value\\
+  no-op max & 30 & Maximum "do nothing" actions by agent at the start of episode.\\
+  learning rate of training & 0.00025 & learning rate used by RMSProp\\
+  decay of RMSProp optimizer & 0.99 & decay rate used by RMSProp\\
+  $\beta$ of RMSProp optimizer & 0.01 & $\beta$ rate of RMSProp\\
+  \hline
+\end{tabular}
+
 \section*{References}
 \small
 % TODO: need to figure out how to cite this stuff properly..
@@ -365,28 +400,5 @@ core part of our experiment which was testing DRQN.
 
 [9] John N. Tsitsiklis and Benjamin Van Roy. An analysis of temporal-difference learning with function approximation. {\it Automatic Control, IEEE Transactions on}, 42(5):647-690, 1997.
 
-
-\section*{Appendix A:}
-
-\begin{tabular}{ |l|l|l| }
-  \hline
-  \multicolumn{3}{|c|}{List of Hyperparameters} \\
-  \hline
-  minibatch size & 32 & number of experiences for SGD update\\
-  replay memory buffer size & 1000000 & number of experiences in memory buffer\\
-  agent history length & 4-32 & number of most recent frames experienced input to the Q network\\
-  target network update frequency & 10000 & number of parameter updates after which the target network updates\\
-  discount factor & 0.99 & Discount factor $\gamma$ used in the Q-learning update\\
-  action repeat & 4 & Repeat each action selected by the agent this many times\\
-  update frequency & 4 & number of actions by agent between successive SGD updates. \\
-  initial exploration & 1 & Initial value of $\epsilon$ in $\epsilon$-greedy exploration \\
-  final exploration & 0.01 & Final value of $\epsilon$ in $\epsilon$-greedy exploration\\
-  final exploration frame & 100000 & The number of frames over which the initial value of $\epsilon$ reaches final value\\
-  no-op max & 30 & Maximum "do nothing" actions by agent at the start of episode.\\
-  learning rate of training & 0.00025 & learning rate used by RMSProp\\
-  decay of RMSProp optimizer & 0.99 & decay rate used by RMSProp\\
-  $\beta$ of RMSProp optimizer & 0.01 & $\beta$ rate of RMSProp\\
-  \hline
-\end{tabular}
 
 \end{document}
