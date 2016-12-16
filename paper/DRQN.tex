@@ -67,14 +67,14 @@
 
 
 \section{Introduction}
-    Recent advances in reinforcement Learning have led to human-level or greater
+    Recent advances in reinforcement learning have led to human-level or greater
     performance on a wide variety of games (e.g. Atari 2600 Games). However,
     training these networks can take a long time, and the techniques presented in
     the state of the art [0] perform poorly on several games that require long
     term planning. \\
     \\
     Deep Q-networks are limited in that they learn a mapping from a single
-    previous state which constist of a small number of game screens. In practice,
+    previous state which consist of a small number of game screens. In practice,
     DQN is trained using an input consisting of the last four game screens. Thus,
     DQN performs poorly at games that require the agent to remember information
     more than four screens ago. This is evident from the types of games DQN performs
@@ -101,19 +101,19 @@
     \end{figure}
 
 
-    In addition to vanilla RNN architectures we also examine augmented RNN
-    architectures such as attention RNNs. Recent achievments of attention RNNs in
+    In addition to vanilla RNN architectures, we also examine augmented RNN
+    architectures such as attention RNNs. Recent achievements of attention RNNs in
     translation tasks [2, 3] have shown promise. The advantage of using attention
     is that it enables DRQN to focus on particular previous states it deems
     important for predicting the action in the current state. We investigate
     augmenting DRQN with attention and evaluate its usefulness.
 
-\section{Relatd Work}
+\section{Related Work}
 
-Reinforcement learning covers a variety of areas from playing backgommon [7] to
-flying RC helicopters [8]. Traditionally reinforcement learning relied upon
+Reinforcement learning covers a variety of areas from playing backgammon [7] to
+flying RC helicopters [8]. Traditionally, reinforcement learning relied upon
 iterative algorithms to train agents on smaller state spaces. Later, algorithms
-such as Q-learning were used with non-linear function aproximators to train agents
+such as Q-learning were used with non-linear function approximators to train agents
 on larger state spaces. These algorithms, however, were more difficult to train
 and would diverge [9].
 
@@ -130,10 +130,10 @@ receives.
 
 \section{Deep Q-Learning}
 
-We examine agents playing Atari games. In our environment the agents interact with
-an Atari emulator. At time $t$ they recieve an observation $x_t \in \mathbb{R}^D$
+We examine agents playing Atari games. In our environment, the agents interact with
+an Atari emulator. At time $t$ they recieve an observation $x_t \in \mathbb{R}^D$,
 which is a vector of pixels from the current game screen. The agent then takes an
-action, $a_t \in \mathcal{A} = \{1, \dots, K\}$ and receives a reward $r_t$ which
+action $a_t \in \mathcal{A} = \{1, \dots, K\}$ and receives a reward $r_t$ which
 is the change in the game score. \\
 \\
 The objective of the agent is to take actions that maximize the future discounted
@@ -142,10 +142,10 @@ where $T$ is the end of the game and $\gamma$ is our discount factor. One way
 to achieve this objective is by taking the action corresponding to the maximum
 action-value function:
 $$Q^*(s,a) = \max_{\pi}\mathbb{E}[r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \dots
-|s_t = s, a_t = a, \pi]$$
+|s_t = s, a_t = a, \pi],$$
 which is the expected value of the future discounted rewards under the policy
-$\pi = P(a|s)$, or the probability of taking an action given the agent is in a
-certain state. Unfortunately this method can be very difficult to calculate it
+$\pi = P(a|s)$. This is the probability of taking an action given the agent is in a
+certain state. Unfortunately, this method can be very difficult to calculate,
 so we approximate it with another function $Q(s,a;\theta) \approx Q^*(s,a)$. We
 examine several different types of deep neural network architectures for our
 function approximator which are called Q-networks. \\
@@ -157,9 +157,9 @@ following loss function is used to help reduce some of these issues [0]:
     r + \gamma \max_{a'}Q(s',a';\theta_i^-) - Q(s,a;\theta_i)\Big)^2\Big]
 \end{equation}
 
-Where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1})$ and the buffer
-in which experiences are stored is $D_t = \{e_1, \dots, e_t\}$. In the SGD update
-we sample minibatches of experience tuples $(s, a, r, s') \sim U(D)$ which are
+where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1})$ and the buffer
+in which experiences are stored is $D_t = \{e_1, \dots, e_t\}$. In the SGD update,
+we sample mini-batches of experience tuples $(s, a, r, s') \sim U(D)$, which are
 drawn uniformly at random from the memory buffer. This is called experience replay
 and is designed to mitigate instability in the training process. In the loss
 function above, $\theta_i^-$ are the network parameters used to compute the target
@@ -169,20 +169,22 @@ Q-network and a target network.
 
 \section{Deep Recurrent Q-Learning}
 
-We examine several architectures for the DRQN. The idea behind using a RNN on top
-of a DQN is to retain information for longer periods of time. This should help the
+We examined several architectures for the DRQN. One of them is the use of a RNN on top
+of a DQN, to retain information for longer periods of time. This should help the
 agent accomplish tasks that may require the agent to remember a particular event
-that happened several dozens screen backs. We also examine using an attention
-mechanism in the RNN. Attention allows the RNN to focus on particular states it
+that happened several dozens screen back. \\
+\\
+We also examined the use of an attention
+mechanism in RNNs. Attention allows the RNN to focus on particular states it
 has seen in the past. One can think of it as assigning importance to the states
-iterated over by the RNN. We investigate $2$ forms of attention; A linear attention
+iterated over by the RNN. We investigate $2$ forms of attention, a linear attention
 that uses a learned vector to assign importances over the previous states and a
 global attention that assigns importances to previous states based on the current
 state. \\
 \\
-The first architecture is a very basic extension of DQN. The architecture of DRQN
+The first architecture is a basic extension of DQN. The architecture of DRQN
 augments DQN's fully connected layer with a LSTM. We accomplish this by looking at
-the last $L$ states, $\{s_{t-(L-1)}, \dots, s_{t}\}$ and feed these into a
+the last $L$ states, $\{s_{t-(L-1)}, \dots, s_{t}\}$, and feed these into a
 convolutional neural network (CNN) to get intermediate outputs
 $\text{CNN}(s_{t-i}) = x_{t-i}$. These are then fed into a RNN (we use an LSTM for
 this but it can be any RNN), $\text{RNN}(x_{t-i}, h_{t-i-1}) = h_{t-i}$, and the
@@ -195,9 +197,9 @@ $Q(\{s_{t-(L-1)}, \dots, s_t\}, a_t)$.
     \caption{Architecture of the Attention DRQN}
 \end{figure}
 
-The second architecture we used was a version of an attention RNN we are calling 
-linear attention. For the linear attention RNN we take the $L$ hidden states
-outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$ and calculate an inner
+The second architecture we used was a version of an attention RNN, we are call 
+linear attention. For the linear attention RNN, we take the $L$ hidden states
+outputted by the RNN, $\{h_{t-(L-1)}, \dots, h_{t}\}$, and calculate an inner
 product with $v_a$, $\{v_a^Th_{t-(L-1)}, \dots, v_a^Th_{t}\}$. This allows the
 model to focus more on nearby hidden states or further away states depending on
 what values of $v_a$ are learned. We then take a softmax over these values,
@@ -206,41 +208,41 @@ sum over the hidden states to get a context vector,
 $c_t = \sum_{i=0}^{L-1}a_{t-i}h_{t-i}$. This context vector is then used to predict
 the $Q$ value. \\
 \\
-The third architecture we used is global attention, similar to the global attention
+The third architecture we used includes a global attention mechanism, similar to the global attention
 used in [3]. A diagram of this type of attention can be seen in Figure 2. We treat
-the current state, $s_t$ as the "decoder" input and the previous $L - 2$ states as
+the current state $s_t$ as the "decoder" input and the previous $L - 2$ states as
 the "encoder" inputs. We compute the following scores,
 $\{{h_{t-(L-1)}}^Th_t, \dots, {h_{t-1}}^Th_t\}$. We then take a softmax over these
 values, $a_{t-i} = \text{softmax}({h_{t-i}}^Th_t)$. The context vector is computed
 as a weighted sum over the previous hidden states, $c_t = \sum_{i=1}^{L-1}a_{t-i}h_{t-i}$.
-Finally the context vector is used to compute $\tilde{h} = \tanh(W_a[h_t;c_t] + b_a)$
+Finally, the context vector is used to compute $\tilde{h} = \tanh(W_a[h_t;c_t] + b_a)$,
 which is then used to predict the $Q$ value. This type of attention allows the model
-to focus on previous states depending on the current state $h_t$ as opposed to a
+to focus on previous states depending on the current state $h_t$, as opposed to a
 fixed vector such as $v_a$. \\
 \\
 Learning sequences of observations creates some difficulty when sampling
 experiences and using the loss function defined in (1). We propose a simple
-solution where we sample $e_t \sim U(D)$ and then take the previous $L$ states,
-$\{s_{t-(L+1)}, \dots, s_t\}$ and zero out states from previous games. For example
-if $s_{t-i}$ was the end of the previous game then we would have states
+solution where we sample $e_t \sim U(D)$, take the previous $L$ states,
+$\{s_{t-(L+1)}, \dots, s_t\}$, and then zero out states from previous games. For example,
+if $s_{t-i}$ was the end of the previous game, then we would have states
 $\{\mathbf{0}, \dots, \mathbf{0}, s_{t-(i+1)}, \dots, s_t\}$ and similarly for the
 next state $\{\mathbf{0}, \dots, \mathbf{0},s_{t-(i+2)}, \dots, s_{t+1}\}$.
 
 \section{Experiments}
 
-For our experiments we mainly focused on the game Q*bert. We chose Q*bert because
+For our experiments, we mainly focused on the game Q*bert. We chose Q*bert because
 it was a challenging game for DQN which achieved scores only slightly above
 human-level [0] but it was not so challenging that DQN could not make any progress,
 such as Montezuma's Revenge [0]. \\
 \\
-For input the DRQN takes a specified number of screens per state. The screen images
-are grayscaled and resized to $80 \times 80$. The first hidden layer convolves $16$,
-$19 \times 19$ filters with stride $8$ across the input image and applies a rectified
-linear unit.  The second hidden layer convolves $32$, $8 \times 8$ filters with
+For input, the DRQN takes a specified number of screens per state. The screen images
+are gray-scaled and resized to $80 \times 80$. The first hidden layer convolves $16$
+filters $(19 \times 19)$ with stride $8$ across the input image and applies a rectified
+linear unit.  The second hidden layer convolves $32$ filters  $(8 \times 8)$ with
 stride $4$, again followed by a rectified linear unit.  Convolutional outputs are
 fed to an LSTM with $256$ hidden units per layer.  Finally, a fully connected
 linear layer outputs a Q-value for each possible action. All of the hyperparameters
-used are listed in Apendix A. These are similar to the hyperparameters used in [0]. \\
+used are listed in appendix A. These are similar to the hyperparameters used in [0]. \\
 
 \begin{figure}[h]
     \centering
@@ -268,32 +270,32 @@ used are listed in Apendix A. These are similar to the hyperparameters used in [
     \caption{Graphs for Seaquest Over 10 Million Iterations}
 \end{figure}
 
-For Figure 3 we trained $4$ different models for about $5$ million iterations on
+For Figure 3, we trained $4$ different models for about $5$ million iterations on
 Q*bert which took about $6$ days to complete. All the models use the same
 convolutional neural network described above for processing the images. DQN uses
 $4$ game screens per state. \\
 \\
-The DRQN models in Figure 3 used $L=16$ and $2$ screens per state which allows it
-to see the last $32$ frames. We wanted to give the model let the model look over
-enough previous states to more informed decision but not so many that RNN suffers
-from vanishing or exploding gradients and training time issues which is why we
-chose $L=16$. We found $2$ screens per states to allow the model to run efficiently
+The DRQN models in Figure 3 used $L=16$ and $2$ screens per state, which allows it
+to see the last $32$ frames. We wanted to let the model look over
+enough previous states to make an informed decision, but not so many that RNN suffers
+from vanishing gradients and training time issues which is why we
+chose $L=16$. We found $2$ screens per state allows the model to run efficiently
 without suffering in scores. DRQN is a basic recurrent model with no attention
 mechanism. DRQN-l is the recurrent model with linear attention and DRQN-g is the
 recurrent model with global attention. \\
 \\
-As you can see from Figure 3 the graphs for the DRQN models are very noisy. The
+As you can see from Figure 3, the graphs for the DRQN models are very noisy. The
 regular DRQN performed the best in terms of average points per life but also had
-the most difficult time reducing the loss. DRQN-l had the noisiest graphs. It
-peformed close to the highest and lowest value at some point on every statistic.
-DRQN-g's performance was dissapointing. It had the easiest time minimizing the loss
+the most difficult time reducing loss. DRQN-l had the noisiest graphs. It
+performed close to the highest and lowest value at some point on every statistic.
+DRQN-g performance was disappointing. It had the easiest time minimizing the loss
 but struggled to gain momentum on average reward per life. \\
 \\
-In Figure 4 we trained all $4$ models on Seaquest. For our DRQN models we used
+In Figure 4, we trained all $4$ models on Seaquest. For our DRQN models, we used
 $L=2$ with $2$ game screens so they were looking over the same number of game
-screens as DQN, $4$. The average scores all converge to the same value which is
-what we would expect since each agent is given the same number of screens to
-predict the $Q$ value with.\\
+screens as DQN, $4$. The average scores all converge to the same value, which is
+what we would expect since each agent is given the same number of screens
+with which to predict the $Q$ value.\\
 
 \begin{figure}[h]
     \begin{center}
@@ -306,45 +308,45 @@ predict the $Q$ value with.\\
             \textbf{DRQN-g} & 550 & 380 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Best Scores for Trained Atari Games}
+    \caption{Best Scores for the Atari Games}
 \end{figure}
 
-In Figure 5 we can see the best scores received from each of the algorithms playing
+In Figure 5, we can see the best scores received from each of the algorithms playing
 $100$ games of Q*bert. This table reflects where the algorithms ended up in the
-average rewards per life graph in Figure 3 with DRQN peforming the best followed
-by DQN, DRQN-l and finally DRQN-g. Unfortunately we were not able to reproduce the
+average rewards per life graph in Figure 3. DRQN performed the best, followed
+by DQN, DRQN-l, and finally DRQN-g. Unfortunately, we were not able to reproduce the
 score achieved by [1] on Q*bert. \\
 \\
-From these figures it is evident that while adding a recurrent layer helped the
-agent, adding an attention mechanism only hidnered the agent. We hypothesize
-several reasons that explain the poorer results. For one, the network that must
-be trained is bigger, there are more parameters to tune and it is apparent from
-the graphs that the attention DRQN did not converge. It is possible that training
-it longer would lead to better results. Another reason is that attention is not
-necessary for playing Q*bert since the agent receives the full game state on each
-screen it does not need to focus on game screens too far back.
+From these figures, it is evident that adding a recurrent layer helped the
+agent, adding an attention mechanism only hindered the agent. We hypothesize
+several reasons that would explain the unexpected results. For one, the network that must
+be trained is larger, with more parameters to tune. It is apparent from
+the graphs that the attention DRQN did not converge. We postulate that  training
+for a longer duration would yield better results. Another reason is that attention might not be
+necessary for playing Q*bert. Since the agent receives the full game state on each
+screen, it does not need to focus on game screens too far back in the past.
 
 \section*{Conclusion}
 
-We investigate using an RNN on top of a DQN (DRQN) and test several different types
-of attention to augment the RNN. We show that a basic DRQN is capable of achieving
-better scores than a DQN on a game that is difficult for DQN to play. We also
-show that adding attention can hinder the performance on certain games as well. \\
+We investigated the utilization of an RNN on top of a DQN (DRQN) and also tested several different types
+of attention mechanisms to augment the RNN. As expected, we confirmed that a basic DRQN is capable of achieving
+better scores than a DQN on a game that is difficult for a DQN to learn. We also
+discovered that adding attention can hinder the performance on certain games as well. \\
 \\
-Going forward we would have liked to train the algorithms for even longer to see
-if attention eventually does perform better. It is apparent that the graphs have
-not converged and are still very noisy. We also think running the agent on games
+Going forward, it would be desirable to train the algorithms for even longer to see
+if attention eventually does perform better. It can be seen that the graphs have
+not converged yet and are still noisy. Also, we theorize that running the agent on games
 where the game state is not fully revealed in the screen would better utilize
 attention to achieve higher scores. Think of a game where in one screen you see
 a person and in the next screen they run behind a wall. The agent should attend
 to the screen where the person was last visible to gain information about where
-they might be in the current frame.
+their current position might possibly be in the current timestep.
 
 \section*{Acknowledgements}
 
 We would like to thank carpedm20 for using his DQN repository as a base for
-running our experiments. It saved us a lot of time and allowed us to focus on the
-core part of our experiment which was testing DRQN.
+running our experiments. It saved time and allowed us to focus on the
+core part of our experiment, which was testing DRQN.
 
 \section*{Appendix A:}
 
