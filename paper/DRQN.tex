@@ -159,7 +159,7 @@ following loss function is used to help reduce some of these issues [0]:
     r + \gamma \max_{a'}Q(s',a';\theta_i^-) - Q(s,a;\theta_i)\Big)^2\Big]
 \end{equation}
 
-Where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1}($ and the buffer
+Where experiences are defined as $e_t = (s_t, a_t, r_t, s_{t+1})$ and the buffer
 in which experiences are stored is $D_t = \{e_1, \dots, e_t\}$. In the SGD update
 we sample minibatches of experience tuples $(s, a, r, s') \sim U(D)$ which are
 drawn uniformly at random from the memory buffer. This is called experience replay
@@ -270,19 +270,6 @@ used are listed in Apendix A. These are similar to the hyperparameters used in [
     \caption{Graphs for Seaquest Over 5 Million Iterations}
 \end{figure}
 
-\begin{figure}[h]
-    \centering
-    \begin{minipage}{1.0\textwidth}
-        \centering
-        \includegraphics[scale=0.2]{SpaceInvaders1}
-        \centering
-        \includegraphics[scale=0.2]{SpaceInvaders2}
-        \centering
-        \includegraphics[scale=0.2]{SpaceInvaders3}
-    \end{minipage}
-    \caption{Graphs for SpaceInvaders Over 5 Million Iterations}
-\end{figure}
-
 For Figure 3 we trained $4$ different models for about $5$ million iterations on
 Q*bert which took about $6$ days to complete. All the models use the same
 convolutional neural network described above for processing the images. DQN uses
@@ -308,11 +295,11 @@ but struggled to gain momentum on average reward per life. \\
     \begin{center}
         \begin{tabular}{| c | c | c | c | c |}
             \hline
-            & \textbf{Q*bert} & \textbf{Seaquest} & \textbf{SpaceInvaders} & \textbf{BattleZone} \\ \hline
-            \textbf{DQN} & 700 & 360 & 500 & \textbf{19000} \\ \hline 
-            \textbf{DRQN} & \textbf{850} & 160/360 & 755 & 11000 \\ \hline
-            \textbf{DRQN-l} & 700 & \textbf{620} & \textbf{765} & 18000 \\ \hline
-            \textbf{DRQN-g} & 550 & 380 & 410 & 18000 \\ \hline
+            & \textbf{Q*bert} & \textbf{Seaquest}  \\ \hline
+            \textbf{DQN} & 700 & 360  \\ \hline 
+            \textbf{DRQN} & \textbf{850} & 360 \\ \hline
+            \textbf{DRQN-l} & 700 & \textbf{620} \\ \hline
+            \textbf{DRQN-g} & 550 & 380 \\ \hline
         \end{tabular}
     \end{center}
     \caption{Best Scores for Trained Atari Games}
@@ -343,10 +330,11 @@ show that adding attention can hinder the performance on certain games as well. 
 Going forward we would have liked to train the algorithms for even longer to see
 if attention eventually does perform better. It is apparent that the graphs have
 not converged and are still very noisy. We also think running the agent on games
-like Battlezone would have had a better time utilizing the attention mechanism to
-achieve higher scores. In Battlezone the entire game state is not revieled in a
-single screen so it is much more important to be able to refer back to previous
-screens for information.
+where the game state is not fully revealed in the screen would better utilize
+attention to achieve higher scores. Think of a game where in one screen you see
+a person and in the next screen they run behind a wall. The agent should attend
+to the screen where the person was last visible to gain information about where
+they might be in the current frame.
 
 \section*{Acknowledgements}
 
